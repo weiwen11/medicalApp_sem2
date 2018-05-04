@@ -49,6 +49,7 @@ Ward::Ward()
 void Ward::setPatient(Patient *p)
 {
 	patient = p;
+	isOccupied = true;
 }
 
 void Ward::setIsOccupied(bool a)
@@ -357,6 +358,34 @@ int main()
 			{
 				pat[Patient::pat_NUM].addPat();
 				assignPatToDoc(doc, pat, Patient::pat_NUM);
+				char chr;
+				cout << "Assign " << pat[Patient::pat_NUM].getName() << " to Room (A - H)" << endl
+					<< "0 to assign later" << endl;
+				cout << "=> ";
+				cin >> chr;
+				if (chr != '0');
+				{
+					chr = toupper(chr);
+					while (chr != 'A' || chr != 'B' || chr != 'C' || chr != 'D' ||
+						chr != 'E' || chr != 'F' || chr != 'G' || chr != 'H')
+					{
+						cout << "Please enter Room (A - H): ";
+						cin >> chr;
+					}
+					int wardNo = chr - 'A';
+					wardNo++;
+					if (ward[wardNo].getIsOccupied() == 0)
+					{
+						ward[wardNo].setPatient(&pat[Patient::pat_NUM]);
+					}
+					else
+					{
+						cout << "Room " << chr << " is occupied by " << ward[wardNo].getPatient()->getName() << endl;
+						cout << "Patient " << pat[Patient::pat_NUM].getName() << " not assigned to Room " << chr;
+					}
+				}
+				
+				
 				Patient::pat_NUM++;
 			}
 			else if (choice == 3)  // return
