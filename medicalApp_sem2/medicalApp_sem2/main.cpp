@@ -12,7 +12,7 @@ void printLine(int);
 int promptInput(string, int, int);
 void pressEnter(bool);
 void displayMenu();
-void assignPatToDoc(Doctor  doc[10], Patient  pat[10]);
+void assignPatToDoc(Doctor  *, Patient  *, int);
 int checkNum(int, int);
 
 void unbindPatient(Doctor *, int, int, int);
@@ -224,7 +224,7 @@ int main()
 						{
 							cout << pat[patNo].getName() << " is not assigned to any doctor." << endl << endl;
 						}
-						assignPatToDoc(doc, pat);
+						assignPatToDoc(doc, pat, patNo);
 					}
 					else if (choice == 2)  // discharge patient
 					{
@@ -266,7 +266,7 @@ int main()
 			else if (choice == 2)  // add patient
 			{
 				pat[Patient::pat_NUM].addPat();
-				assignPatToDoc(doc, pat);
+				assignPatToDoc(doc, pat, Patient::pat_NUM);
 				Patient::pat_NUM++;
 			}
 			else if (choice == 3)  // return
@@ -294,14 +294,14 @@ int main()
 	return 0;
 }
 
-void assignPatToDoc(Doctor * doc, Patient * pat)
+void assignPatToDoc(Doctor * doc, Patient * pat, int patNo)
 {
 	docList(doc);
 	if (Doctor::doc_NUM != 0)
 	{
 		cout << endl << "Assign to doctor number => ";
 		int temp = checkNum(0, Doctor::doc_NUM);
-		doc[temp - 1].setPatient(&pat[Patient::pat_NUM], Patient::pat_NUM);
+		doc[temp - 1].setPatient(&pat[patNo], Patient::pat_NUM);
 		pressEnter(1);
 	}
 	else

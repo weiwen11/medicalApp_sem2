@@ -1,4 +1,3 @@
 ﻿  main.cpp
-  Person.cpp
-  Generating Code...
+c:\users\user\source\repos\medicalapp_sem2\medicalapp_sem2\medicalapp_sem2\main.cpp(80): warning C4101: 'ward': unreferenced local variable
   medicalApp_sem2.vcxproj -> C:\Users\User\Source\Repos\medicalApp_sem2\medicalApp_sem2\Debug\medicalApp_sem2.exe
