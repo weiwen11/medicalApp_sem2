@@ -24,6 +24,54 @@ void deleteDoc(Doctor);
 void saveDoc(fstream &, Doctor*);
 void savePat(fstream &, Patient *);
 
+class Ward
+{
+	Patient *patient;
+	bool isOccupied;
+	double rate;
+public:
+	void setPatient(Patient *);
+	void setIsOccupied(bool);
+	void setRate(double);
+	Patient * getPatient() const;
+	bool getIsOccupied() const;
+	double getRate() const;
+};
+void Ward::setPatient(Patient *p)
+{
+	patient = p;
+}
+
+void Ward::setIsOccupied(bool a)
+{
+	isOccupied = a;
+}
+
+void Ward::setRate(double r)
+{
+	rate = r;
+}
+
+Patient * Ward::getPatient() const
+{
+	return patient;
+}
+
+bool Ward::getIsOccupied() const
+{
+	return isOccupied;
+}
+
+double Ward::getRate() const
+{
+	return rate;
+}
+
+
+
+
+
+
 const int MAX = 20;
 
 int main()
