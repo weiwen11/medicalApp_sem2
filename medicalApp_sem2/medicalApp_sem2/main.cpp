@@ -12,6 +12,7 @@ void printLine(int);
 int promptInput(string, int, int);
 void pressEnter(bool);
 void displayMenu();
+void assignPatToDoc(Doctor  doc[10], Patient  pat[10]);
 int checkNum(int, int);
 
 void unbindPatient(Doctor *, int, int, int);
@@ -68,11 +69,7 @@ double Ward::getRate() const
 }
 
 
-
-
-
-
-const int MAX = 20;
+const int MAX = 10;
 
 int main()
 {
@@ -80,6 +77,7 @@ int main()
 	cout << fixed << setprecision(2);
 	Doctor doc[MAX];
 	Patient pat[MAX];
+	Ward ward[8];
 
 	// input doctor and patient data
 	ifstream inp;
@@ -174,12 +172,6 @@ int main()
 		}
 		while (choice == 2)
 		{
-			//  Staffs
-
-			break;
-		}
-		while (choice == 3)
-		{
 			patList(pat);
 
 			patMenu(1);
@@ -232,16 +224,7 @@ int main()
 						{
 							cout << pat[patNo].getName() << " is not assigned to any doctor." << endl << endl;
 						}
-						docList(doc);
-						if (Doctor::doc_NUM != 0)
-						{
-							cout << "Assign to doctor number => ";
-							int docNo = checkNum(0, Doctor::doc_NUM);
-							doc[docNo - 1].setPatient(&pat[patNo], patNo);
-							cout << pat[patNo].getName() << " is now patient of " << doc[docNo - 1].getName() << "." << endl;
-						}
-						cout << endl;
-						pressEnter(1);
+						assignPatToDoc(doc, pat);
 					}
 					else if (choice == 2)  // discharge patient
 					{
@@ -283,20 +266,7 @@ int main()
 			else if (choice == 2)  // add patient
 			{
 				pat[Patient::pat_NUM].addPat();
-				docList(doc);
-				if (Doctor::doc_NUM != 0)
-				{
-					cout << endl
-						<< "Assign to doctor number => ";
-					int temp = checkNum(0, Doctor::doc_NUM);
-					doc[temp - 1].setPatient(&pat[Patient::pat_NUM], Patient::pat_NUM);
-					pressEnter(1);
-				}
-				else
-				{
-					cout << endl;
-					pressEnter(0);
-				}
+				assignPatToDoc(doc, pat);
 				Patient::pat_NUM++;
 			}
 			else if (choice == 3)  // return
@@ -306,21 +276,14 @@ int main()
 				break;
 			}
 			savePat(out, pat);
-			choice = 3;
+			choice = 2;
 		}
-		while (choice == 4)
+		while (choice == 3)  // wards
 		{
-			//  Attendance
 
 			break;
 		}
-		while (choice == 5)
-		{
-			//  Wards
-
-			break;
-		}
-		if (choice == 6)
+		if (choice == 4)
 		{
 			cout << "Thank you for using this program" << endl;
 			break;
@@ -331,17 +294,32 @@ int main()
 	return 0;
 }
 
+void assignPatToDoc(Doctor * doc, Patient * pat)
+{
+	docList(doc);
+	if (Doctor::doc_NUM != 0)
+	{
+		cout << endl << "Assign to doctor number => ";
+		int temp = checkNum(0, Doctor::doc_NUM);
+		doc[temp - 1].setPatient(&pat[Patient::pat_NUM], Patient::pat_NUM);
+		pressEnter(1);
+	}
+	else
+	{
+		cout << endl;
+		pressEnter(0);
+	}
+}
+
 void displayMenu()
 {
 	cout << "  Ward 3 information center" << endl;
 	printLine(1);
 	cout << "  Please select an option" << endl
 		<< "  1. Doctor" << endl
-		<< "  2. Staff" << endl
-		<< "  3. Patient" << endl
-		<< "  4. Employee's attendence" << endl
-		<< "  5. Ward" << endl
-		<< "  6. Exit" << endl
+		<< "  2. Patient" << endl
+		<< "  3. Ward" << endl
+		<< "  4. Exit" << endl
 		<< endl;
 }
 void doctorMenu()
