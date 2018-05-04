@@ -116,7 +116,7 @@ Patient::Patient()
 	condition = "";
 	height = 0;
 	weight = 0;
-	assigned = false;
+	isAssigned = false;
 }
 void Patient::addPat()
 {
@@ -170,7 +170,7 @@ void Patient::readRecord(ifstream & inp)
 		contact.setEmail(test);
 		getline(inp, ic, ',');
 		getline(inp, condition, ',');
-		inp >> height >> weight >> assigned;
+		inp >> height >> weight >> isAssigned;
 		inp.ignore();
 		pat_NUM++;
 	}
@@ -179,7 +179,7 @@ void Patient::writeRecord(fstream & out, int i) const
 {
 	out << name << "," << gender << "," << contact.getPhoneNum() << ","
 		<< contact.getEmail() << "," << ic << ","
-		<< condition << "," << height << " " << weight << " " << assigned;
+		<< condition << "," << height << " " << weight << " " << isAssigned;
 	if (i != pat_NUM - 1)
 		out << endl;
 }
@@ -201,7 +201,7 @@ void Patient::display() const
 }
 bool Patient::getAssigned() const
 {
-	return assigned;
+	return isAssigned;
 }
 double Patient::getWeight() const
 {
@@ -213,7 +213,7 @@ double Patient::getHeight() const
 }
 void Patient::setAssigned(bool a)
 {
-	assigned = a;
+	isAssigned = a;
 }
 
 Doctor::Doctor()

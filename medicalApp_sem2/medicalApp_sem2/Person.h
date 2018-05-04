@@ -47,7 +47,7 @@ class Patient : public Person
 {
 	string condition;
 	double height, weight;
-	bool assigned;
+	bool isAssigned;
 public:
 	Patient();
 	static int pat_NUM;
