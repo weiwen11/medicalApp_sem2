@@ -295,7 +295,7 @@ int main()
 						else
 						{
 							docList(doc);
-							if (Doctor::doc_NUM == 0)
+							if (Doctor::doc_NUM != 0)
 							{
 								cout << endl << "Assign to doctor number => ";
 								temp = checkNum(0, Doctor::doc_NUM);
@@ -323,11 +323,11 @@ int main()
 										doc[di].noPat--;
 										doc[di].patIndex[pi] = 0;
 									}
+									doc[temp].setPatient(&pat[patNo], patNo);
+									cout << pat[patNo].getName() << " assigned to Dr " << doc[temp].getName() << endl;
 								}
 							}
 						}
-						doc[temp].setPatient(&pat[patNo], patNo);
-						cout << pat[patNo].getName() << " assigned to Dr " << doc[temp].getName() << endl;
 						pressEnter(1);
 					}
 					else if (choice == 2)  // discharge patient
