@@ -537,7 +537,7 @@ void saveDoc(fstream &out, Doctor * doc)
 
 void unbindPatient(Doctor * doc, int di, int pi, int patNo)
 {
-	if (pi + 1 < doc->getNoPat())
+	if (pi + 1 < doc[di].getNoPat())
 	{
 		doc[di].patIndex[pi] = 0;
 		for (int i = pi; i < doc[di].getNoPat(); i++)
