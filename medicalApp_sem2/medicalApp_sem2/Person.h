@@ -71,7 +71,7 @@ class Doctor : public Employee
 
 public:
 	Doctor();
-	Patient *patient[10];
+	Patient *patient[20];
 	int noPat;
 	int patIndex[10];
 	static int doc_NUM;
