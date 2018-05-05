@@ -81,10 +81,10 @@ string Ward::getPatientName() const
 }
 string Ward::getPatientDoc(Doctor * doc, Patient *pat) const
 {
-	int index;
+	int index = 0;
 	int docIndex, tmp;
 	string s = "(";
-	if (patient != NULL)
+	if (patient != NULL && patient->getAssigned() == true)
 	{
 		for (int i = 0; i < Patient::pat_NUM; i++)
 		{
@@ -135,7 +135,7 @@ string allignMid(string s, int width)
 		int pad = width - length;
 		string spaces(pad / 2, ' ');
 		result = spaces + s;
-		while (result.length() < width)
+		while (result.length() < (unsigned int)width)
 			result += " ";
 		return result;
 	}
@@ -291,6 +291,15 @@ int main()
 						if (pat[patNo].getAssigned() == false)
 						{
 							cout << pat[patNo].getName() << " is not assigned to any doctor." << endl << endl;
+							docList(doc);
+							if (Doctor::doc_NUM != 0)
+							{
+								cout << endl << "Assign to doctor number => ";
+								temp = checkNum(0, Doctor::doc_NUM);
+								temp--;
+								doc[temp].setPatient(&pat[patNo], patNo);
+								cout << pat[patNo].getName() << " assigned to Dr " << doc[temp].getName() << endl;
+							}
 						}
 						else
 						{
@@ -377,8 +386,7 @@ int main()
 				cout << endl;
 				printWardAvail(ward);
 				cout << "Assign " << pat[Patient::pat_NUM].getName() << " to room (A - H)" << endl
-					<< "Enter 'Z' to assign later" << endl;
-				cout << "=> ";
+					<< "Enter 'Z' to assign later " << " => ";
 				cin >> chr;
 				chr = toupper(chr);
 				while (cin)
@@ -386,7 +394,7 @@ int main()
 					if (chr != 'A' && chr != 'B' && chr != 'C' && chr != 'D' &&
 						chr != 'E' && chr != 'F' && chr != 'G' && chr != 'H')
 					{
-						cout << "Please enter correct room: ";
+						cout << "Please enter correct room => ";
 						cin >> chr;
 						chr = toupper(chr);
 					}
@@ -547,6 +555,7 @@ void unbindPatient(Doctor * doc, int di, int pi, int patNo)
 		}
 		doc[di].noPat--;
 	}
+
 	else
 	{
 		doc[di].patient[pi] = NULL;
