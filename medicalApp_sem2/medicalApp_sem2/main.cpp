@@ -27,10 +27,11 @@ void savePat(fstream &, Patient *);
 
 class Ward
 {
-	Patient *patient;
 	bool isOccupied;
 	double rate;
 public:
+
+	Patient *patient;
 	Ward();
 	void setPatient(Patient *);
 	void setIsOccupied(bool);
@@ -41,8 +42,14 @@ public:
 	bool getIsOccupied() const;
 	string getAvail() const;
 	double getRate() const;
+	void release();
 	friend void printWard();
 };
+void Ward::release() 
+{
+	isOccupied = false;
+	patient = NULL;
+}
 Ward::Ward()
 {
 	patient = NULL;
@@ -351,6 +358,13 @@ int main()
 							{
 								unbindPatient(doc, di, pi, patNo);
 							}
+							for (int i = 0; i < 8; i++)
+							{
+								if (ward[i].getPatient() == &pat[patNo])
+								{
+									ward[i].release();
+								}
+							}
 							for (int i = patNo; i < Patient::pat_NUM; i++)
 							{
 								pat[i] = pat[i + 1];
@@ -447,6 +461,10 @@ int main()
 	}
 	saveDoc(out, doc);
 	savePat(out, pat);
+	out.open("ward.txt", ios::out);
+	for (int i = 0; i < 8; i++)
+		out << ward[0].getPatientName() << endl;
+	out.close();
 	return 0;
 }
 
