@@ -39,6 +39,7 @@ public:
 	string getPatientName() const;
 	string getPatientDoc(Doctor *, Patient *) const;
 	bool getIsOccupied() const;
+	string getAvail() const;
 	double getRate() const;
 	friend void printWard();
 };
@@ -106,6 +107,14 @@ bool Ward::getIsOccupied() const
 	return isOccupied;
 }
 
+string Ward::getAvail() const
+{
+	if (patient == NULL)
+		return "Available";
+	else
+		return getPatientName();
+}
+
 double Ward::getRate() const
 {
 	return rate;
@@ -144,6 +153,7 @@ string allignMid(string s, int width)
 		return s;
 	}
 }
+void printWardAvail(Ward *);
 void printWard(Ward *, Doctor *, Patient *);
 const int MAX = 20;
 
@@ -277,31 +287,47 @@ int main()
 					if (choice == 1)  // change doctor
 					{
 
-						if (pat[patNo].getAssigned())
-						{
-							if (pi + 1 < doc[di].getNoPat())
-							{
-								doc[di].patient[pi] = NULL;
-								doc[di].patIndex[pi] = 0;
-								for (int i = pi; i < doc[di].getNoPat() - 1; i++)
-								{
-									doc[di].patient[i] = doc[di].patient[i + 1];
-									doc[di].patIndex[i] = doc[di].patIndex[i + 1];
-								}
-								doc[di].noPat--;
-							}
-							else
-							{
-								doc[di].patient[pi] = NULL;
-								doc[di].noPat--;
-								doc[di].patIndex[pi] = 0;
-							}
-						}
-						else
+						int temp;
+						if (pat[patNo].getAssigned() == false)
 						{
 							cout << pat[patNo].getName() << " is not assigned to any doctor." << endl << endl;
 						}
-						assignPatToDoc(doc, pat, patNo);
+						else
+						{
+							docList(doc);
+							if (Doctor::doc_NUM == 0)
+							{
+								cout << endl << "Assign to doctor number => ";
+								temp = checkNum(0, Doctor::doc_NUM);
+								temp--;
+								if (temp == di)
+								{
+									cout << "Already assigned to " << doc[di].getName() << endl;
+								}
+								else
+								{
+									if (pi + 1 < doc[di].getNoPat())
+									{
+										doc[di].patient[pi] = NULL;
+										doc[di].patIndex[pi] = 0;
+										for (int i = pi; i < doc[di].getNoPat() - 1; i++)
+										{
+											doc[di].patient[i] = doc[di].patient[i + 1];
+											doc[di].patIndex[i] = doc[di].patIndex[i + 1];
+										}
+										doc[di].noPat--;
+									}
+									else
+									{
+										doc[di].patient[pi] = NULL;
+										doc[di].noPat--;
+										doc[di].patIndex[pi] = 0;
+									}
+								}
+							}
+						}
+						doc[temp].setPatient(&pat[patNo], patNo);
+						cout << pat[patNo].getName() << " assigned to Dr " << doc[temp].getName() << endl;
 						pressEnter(1);
 					}
 					else if (choice == 2)  // discharge patient
@@ -328,7 +354,7 @@ int main()
 								{
 									cout << doc[i].getName() << (doc[i].getPatIndex(j));
 									doc[i].initPatient(&pat[(doc[i].getPatIndex(j))], j);
-									doc[i].patient[j]->getName();
+									cout << doc[i].patient[j]->getName();
 								}
 							}
 							cout << "Patient discharged." << endl;
@@ -337,6 +363,7 @@ int main()
 						{
 							cout << "Patient not discharged." << endl;
 						}
+						cout << endl;
 						pressEnter(1);
 					}
 				}
@@ -347,6 +374,8 @@ int main()
 				assignPatToDoc(doc, pat, Patient::pat_NUM);
 				char chr;
 				int wardNo;
+				cout << endl;
+				printWardAvail(ward);
 				cout << "Assign " << pat[Patient::pat_NUM].getName() << " to room (A - H)" << endl
 					<< "Enter 'Z' to assign later" << endl;
 				cout << "=> ";
@@ -421,7 +450,7 @@ void assignPatToDoc(Doctor * doc, Patient * pat, int patNo)
 		cout << endl << "Assign to doctor number => ";
 		int temp = checkNum(0, Doctor::doc_NUM);
 		temp--;
-		doc[temp].setPatient(&pat[patNo], Patient::pat_NUM);
+		doc[temp].setPatient(&pat[patNo], patNo);
 		cout << pat[patNo].getName() << " assigned to Dr " << doc[temp].getName() << endl;
 	}
 	else
@@ -526,7 +555,7 @@ void unbindPatient(Doctor * doc, int di, int pi, int patNo)
 	}
 	for (int i = 0; i < Doctor::doc_NUM; i++)
 	{
-		for (int j = 0; j < doc[i].getNoPat(); i++)
+		for (int j = 0; j < doc[i].getNoPat(); j++)
 		{
 			if (doc[i].patIndex[j] > patNo)
 				doc[i].patIndex[j]--;
@@ -626,6 +655,20 @@ int checkNum(int min, int max)
 	}
 	cout << endl;
 	return x;
+}
+void printWardAvail(Ward *ward)
+{
+	cout << "List of rooms" << endl;
+	printLine(1);
+	cout << "Room A: " << ward[0].getAvail() << endl;
+	cout << "Room B: " << ward[1].getAvail() << endl;
+	cout << "Room C: " << ward[2].getAvail() << endl;
+	cout << "Room D: " << ward[3].getAvail() << endl;
+	cout << "Room E: " << ward[4].getAvail() << endl;
+	cout << "Room F: " << ward[5].getAvail() << endl;
+	cout << "Room G: " << ward[6].getAvail() << endl;
+	cout << "Room H: " << ward[7].getAvail() << endl;
+	cout << endl;
 }
 void printWard(Ward *ward, Doctor * doc, Patient * pat)
 {
