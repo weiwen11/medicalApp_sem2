@@ -210,6 +210,25 @@ int main()
 		}
 	}
 	inp.close();
+	inp.open("ward.txt");
+	if (!inp)
+		cout << "Creating ward.txt..." << endl;
+	else
+	{
+		string inName;
+		for (int i = 0; i < 8; i++)
+		{
+			getline(inp, inName);
+			for (int j = 0; j < Patient::pat_NUM; j++)
+			{
+				if (pat[j].getName() == inName)
+				{
+					ward[i].setPatient(&pat[j]);
+				}
+			}
+		}
+	}
+	inp.close();
 
 	int choice = 0;
 	while (choice == 0)
@@ -364,6 +383,10 @@ int main()
 								{
 									ward[i].release();
 								}
+								if (ward[i].getPatient() > &pat[patNo])
+								{
+									ward[i].patient--;
+								}
 							}
 							for (int i = patNo; i < Patient::pat_NUM; i++)
 							{
@@ -463,7 +486,7 @@ int main()
 	savePat(out, pat);
 	out.open("ward.txt", ios::out);
 	for (int i = 0; i < 8; i++)
-		out << ward[0].getPatientName() << endl;
+		out << ward[i].getPatientName() << endl;
 	out.close();
 	return 0;
 }
