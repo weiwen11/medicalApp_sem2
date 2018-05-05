@@ -48,6 +48,7 @@ public:
 void Ward::release() 
 {
 	isOccupied = false;
+	patient->setAssigned(false);
 	patient = NULL;
 }
 Ward::Ward()
@@ -91,19 +92,22 @@ string Ward::getPatientDoc(Doctor * doc, Patient *pat) const
 	int index = 0;
 	int docIndex, tmp;
 	string s = "(";
-	if (patient != NULL && patient->getAssigned() == true)
+	if (patient != NULL)
 	{
-		for (int i = 0; i < Patient::pat_NUM; i++)
+		if (patient->getAssigned() == true)
 		{
-			if (patient->getName() == pat[i].getName())
-			{
-				index = i;
-			}
+			for (int i = 0; i < Patient::pat_NUM; i++)
+				if (patient->getName() == pat[i].getName())
+				{
+					index = i;
+				}
+			findPatientInDoc(doc, pat, index, docIndex, tmp);
+			s += doc[docIndex].getName();
+			s += ")";
+			return s;
 		}
-		findPatientInDoc(doc, pat, index, docIndex, tmp);
-		s += doc[docIndex].getName();
-		s += ")";
-		return s;
+		else
+			return "";
 	}
 	else
 		return "";
@@ -372,9 +376,11 @@ int main()
 						cin >> yesno;
 						if (yesno == "Y")
 						{
+							bool pass = false;
 							cout << pat[patNo].getAssigned();
 							if (pat[patNo].getAssigned())
 							{
+								pass = true;
 								unbindPatient(doc, di, pi, patNo);
 							}
 							for (int i = 0; i < 8; i++)
@@ -398,9 +404,12 @@ int main()
 							{
 								for (int j = 0; j < doc[i].getNoPat(); j++)
 								{
+									if (doc[i].patIndex[j] > patNo && pass == false)
+										doc[i].patIndex[j]--;
 									cout << doc[i].getName() << (doc[i].getPatIndex(j));
 									doc[i].initPatient(&pat[(doc[i].getPatIndex(j))], j);
 									cout << doc[i].patient[j]->getName();
+								
 								}
 							}
 							cout << "Patient discharged." << endl;
