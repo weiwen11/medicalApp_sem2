@@ -49,6 +49,7 @@ Ward::Ward()
 void Ward::setPatient(Patient *p)
 {
 	patient = p;
+	patient->setIsRoomed(true);
 	isOccupied = true;
 }
 
@@ -359,33 +360,46 @@ int main()
 				pat[Patient::pat_NUM].addPat();
 				assignPatToDoc(doc, pat, Patient::pat_NUM);
 				char chr;
-				cout << "Assign " << pat[Patient::pat_NUM].getName() << " to Room (A - H)" << endl
-					<< "0 to assign later" << endl;
+				int wardNo;
+				cout << "Assign " << pat[Patient::pat_NUM].getName() << " to room (A - H)" << endl
+					<< "Enter 'Z' to assign later" << endl;
 				cout << "=> ";
 				cin >> chr;
-				if (chr != '0');
+				chr = toupper(chr);
+				while (cin)
 				{
-					chr = toupper(chr);
-					while (chr != 'A' || chr != 'B' || chr != 'C' || chr != 'D' ||
-						chr != 'E' || chr != 'F' || chr != 'G' || chr != 'H')
+					if (chr != 'A' && chr != 'B' && chr != 'C' && chr != 'D' &&
+						chr != 'E' && chr != 'F' && chr != 'G' && chr != 'H')
 					{
-						cout << "Please enter Room (A - H): ";
+						cout << "Please enter correct room: ";
 						cin >> chr;
+						chr = toupper(chr);
 					}
-					int wardNo = chr - 'A';
-					wardNo++;
-					if (ward[wardNo].getIsOccupied() == 0)
+					else if (chr == 'Z')
 					{
-						ward[wardNo].setPatient(&pat[Patient::pat_NUM]);
+						cout << pat[Patient::pat_NUM].getName() << " not assigned to any room" << endl;
+						break;
 					}
 					else
 					{
-						cout << "Room " << chr << " is occupied by " << ward[wardNo].getPatient()->getName() << endl;
-						cout << "Patient " << pat[Patient::pat_NUM].getName() << " not assigned to Room " << chr;
+						wardNo = chr - 'A';
+						wardNo++;  // A - A = 0 + 1 = 1
+						if (ward[wardNo].getIsOccupied() == 0)
+						{
+							ward[wardNo].setPatient(&pat[Patient::pat_NUM]);
+							cout << pat[Patient::pat_NUM].getName() << " assinged to room " << chr << endl;
+							cout << "gg" << wardNo << ward[wardNo].getPatient()->getName();
+							break;
+						}
+						else
+						{
+							cout << "Room " << chr << " is occupied by " << ward[wardNo].getPatient()->getName() << endl;
+							cout << "Please enter another room: ";
+							cin >> chr;
+							chr = toupper(chr);
+						}
 					}
 				}
-				
-				
 				Patient::pat_NUM++;
 			}
 			else if (choice == 3)  // return
@@ -420,7 +434,9 @@ void assignPatToDoc(Doctor * doc, Patient * pat, int patNo)
 	{
 		cout << endl << "Assign to doctor number => ";
 		int temp = checkNum(0, Doctor::doc_NUM);
-		doc[temp - 1].setPatient(&pat[patNo], Patient::pat_NUM);
+		temp--;
+		doc[temp].setPatient(&pat[patNo], Patient::pat_NUM);
+		cout << pat[patNo].getName() << " assigned to Dr " << doc[temp].getName() << endl;
 		pressEnter(1);
 	}
 	else

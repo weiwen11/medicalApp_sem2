@@ -216,6 +216,16 @@ void Patient::setAssigned(bool a)
 	isAssigned = a;
 }
 
+bool Patient::getIsRoomed() const
+{
+	return isRoomed;
+}
+
+void Patient::setIsRoomed(bool a)
+{
+	isRoomed = a;
+}
+
 Doctor::Doctor()
 {
 	noPat = 0;

@@ -48,6 +48,7 @@ class Patient : public Person
 	string condition;
 	double height, weight;
 	bool isAssigned;
+	bool isRoomed;
 public:
 	Patient();
 	static int pat_NUM;
@@ -59,6 +60,8 @@ public:
 	string getCondition() const;
 	bool getAssigned() const;
 	void setAssigned(bool);
+	bool getIsRoomed() const;
+	void setIsRoomed(bool);
 	void readRecord(ifstream &);
 	void writeRecord(fstream &, int) const;
 	void display() const;
