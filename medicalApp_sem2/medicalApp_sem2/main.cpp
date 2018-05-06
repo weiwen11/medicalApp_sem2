@@ -239,7 +239,7 @@ int main()
 	{
 		printWard(ward, doc, pat);
 		displayMenu();
-		choice = promptInput(username, 1, 6);
+		choice = promptInput(username, 1, 3);
 		while (choice == 1)
 		{
 			docList(doc);
@@ -313,7 +313,7 @@ int main()
 						cout << "\tNot assigned to any doctor." << endl << endl;
 
 					patMenu(2);
-					choice = promptInput(username, 1, 3);
+					choice = promptInput(username, 1, 4);
 					if (choice == 1)  // change doctor
 					{
 
@@ -369,7 +369,11 @@ int main()
 						}
 						pressEnter(1);
 					}
-					else if (choice == 2)  // discharge patient
+					else if (choice == 2)  // set / change room
+					{
+						printWardAvail(ward);
+					}
+					else if (choice == 3) // discharge patient
 					{
 						cout << "Confirm to discharge '" << pat[patNo].getName() << "'? (Y / n): ";
 						string yesno;
@@ -409,7 +413,7 @@ int main()
 									cout << doc[i].getName() << (doc[i].getPatIndex(j));
 									doc[i].initPatient(&pat[(doc[i].getPatIndex(j))], j);
 									cout << doc[i].patient[j]->getName();
-								
+
 								}
 							}
 							cout << "Patient discharged." << endl;
@@ -480,12 +484,7 @@ int main()
 			savePat(out, pat);
 			choice = 2;
 		}
-		while (choice == 3)  // wards
-		{
-
-			break;
-		}
-		if (choice == 4)
+		if (choice == 3)
 		{
 			cout << "Thank you for using this program" << endl;
 			break;
@@ -525,8 +524,7 @@ void displayMenu()
 	cout << "  Please select an option" << endl
 		<< "  1. Doctor" << endl
 		<< "  2. Patient" << endl
-		<< "  3. Ward" << endl
-		<< "  4. Exit" << endl
+		<< "  3. Exit" << endl
 		<< endl;
 }
 void doctorMenu()
@@ -551,9 +549,10 @@ void patMenu(int select)
 	else if (select == 2)
 	{
 		cout << "  Please select an option" << endl
-			<< "  1. Change doctor" << endl
-			<< "  2. Discharge patient" << endl
-			<< "  3. Go back" << endl << endl;
+			<< "  1. Set / change doctor" << endl
+			<< "  2. Set / change room" << endl
+			<< "  3. Discharge patient" << endl
+			<< "  4. Go back" << endl << endl;
 	}
 }
 
