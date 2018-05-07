@@ -170,7 +170,7 @@ void Patient::readRecord(ifstream & inp)
 		contact.setEmail(test);
 		getline(inp, ic, ',');
 		getline(inp, condition, ',');
-		inp >> height >> weight >> isAssigned;
+		inp >> height >> weight >> isAssigned >> isAdmit;
 		inp.ignore();
 		pat_NUM++;
 	}
@@ -179,7 +179,7 @@ void Patient::writeRecord(fstream & out, int i) const
 {
 	out << name << "," << gender << "," << contact.getPhoneNum() << ","
 		<< contact.getEmail() << "," << ic << ","
-		<< condition << "," << height << " " << weight << " " << isAssigned;
+		<< condition << "," << height << " " << weight << " " << isAssigned << " " << isAdmit;
 	if (i != pat_NUM - 1)
 		out << endl;
 }
@@ -199,7 +199,7 @@ void Patient::display() const
 		<< setw(4) << "" << setw(15) << "Condition "
 		<< ": " << condition << endl << endl;
 }
-bool Patient::getAssigned() const
+bool Person::getIsAssigned() const
 {
 	return isAssigned;
 }
@@ -211,36 +211,26 @@ double Patient::getHeight() const
 {
 	return height;
 }
-void Patient::setAssigned(bool a)
+void Person::setIsAssigned(bool a)
 {
 	isAssigned = a;
 }
 
-bool Patient::getIsRoomed() const
+bool Patient::getIsAdmit() const
 {
-	return isRoomed;
+	return isAdmit;
 }
 
-void Patient::setIsRoomed(bool a)
+void Patient::setIsAdmit(bool a)
 {
-	isRoomed = a;
+	isAdmit = a;
 }
 
 Doctor::Doctor()
 {
-	noPat = 0;
-	for (int i = 0; i < 10; i++)
-	{
-		patient[i] = NULL;
-		patIndex[i] = NULL;
-	}
-
 }
 void Doctor::addDoc()
 {
-	for (int i = 0; i < 10; i++)
-		patient[i] = NULL;
-	noPat = 0;
 	doc_NUM++;
 	cout << "New employee" << endl
 		<< endl;
@@ -274,29 +264,6 @@ void Doctor::addDoc()
 	cout << endl;
 	cout << "Record Saved. ";
 }
-void Doctor::setPatient(Patient *p, int i)
-{
-	patIndex[noPat] = i;
-	patient[noPat] = p;
-	noPat++;
-	p->setAssigned(true);
-}
-int Doctor::getNoPat() const
-{
-	return noPat;
-}
-int Doctor::getPatIndex(int i) const
-{
-	return patIndex[i];
-}
-Patient * Doctor::getPatient(int index) const
-{
-	return patient[index];
-}
-void Doctor::initPatient(Patient *p, int i)
-{
-	patient[i] = p;
-}
 void Doctor::readRecord(ifstream &inp)
 {
 	string test;
@@ -311,11 +278,7 @@ void Doctor::readRecord(ifstream &inp)
 		contact.setPhone(test);
 		getline(inp, test, ',');
 		contact.setEmail(test);
-		inp >> payRate >> noPat;
-		for (int i = 0; i < noPat; i++)
-		{
-			inp >> patIndex[i];
-		}
+		inp >> payRate;
 		inp.ignore();
 		doc_NUM++;
 	}
@@ -324,11 +287,7 @@ void Doctor::writeRecord(fstream &out, int i) const
 {
 	out << name << "," << gender << "," << ic << "," << position << ","
 		<< contact.getPhoneNum() << "," << contact.getEmail() << ","
-		<< payRate << " " << noPat;
-	for (int i = 0; i < noPat; i++)
-	{
-		out << " " << patIndex[i];
-	}
+		<< payRate;
 	if (i != doc_NUM - 1)
 		out << endl;
 }
@@ -340,19 +299,7 @@ void Doctor::display(int x) const
 		<< ": " << getPosName() << endl
 		<< setw(4) << "" << setw(15) << "Salary"
 		<< ": RM" << findSalary() << endl
-		<< endl
-		<< "Patient list: ";
-	for (int j = 0; j < noPat; j++)
-	{
-		if (j == noPat - 1)
-			cout << patient[j]->getName() << ". ";
-		else
-			cout << patient[j]->getName() << ", ";
-	}
-	if (noPat == 0)
-	{
-		cout << "none";
-	}
+		<< endl;
 	cout << endl;
 	printLine(2);
 	cout << endl;

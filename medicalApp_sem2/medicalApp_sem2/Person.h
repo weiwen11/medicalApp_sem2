@@ -21,6 +21,7 @@ class Person
 protected:
 	string name, ic, gender;
 	Contact contact;
+	bool isAssigned;
 public:
 	Person();
 	string getName() const;
@@ -28,6 +29,8 @@ public:
 	string getGender() const;
 	string getContactNum() const;
 	string getContactEmail() const;
+	bool getIsAssigned() const;
+	void setIsAssigned(bool);
 	void printPerson() const;
 	virtual void readRecord(ifstream &);
 	void readBasic();
@@ -47,8 +50,7 @@ class Patient : public Person
 {
 	string condition;
 	double height, weight;
-	bool isAssigned;
-	bool isRoomed;
+	bool isAdmit;
 public:
 	Patient();
 	static int pat_NUM;
@@ -58,10 +60,9 @@ public:
 	double getBMI() const;
 	string getBMIStatus(double) const;
 	string getCondition() const;
-	bool getAssigned() const;
-	void setAssigned(bool);
-	bool getIsRoomed() const;
-	void setIsRoomed(bool);
+	
+	bool getIsAdmit() const;
+	void setIsAdmit(bool);
 	void readRecord(ifstream &);
 	void writeRecord(fstream &, int) const;
 	void display() const;
@@ -71,16 +72,8 @@ class Doctor : public Employee
 
 public:
 	Doctor();
-	Patient *patient[20];
-	int noPat;
-	int patIndex[10];
 	static int doc_NUM;
-	void setPatient(Patient *, int);
-	Patient *getPatient(int) const;
-	int getNoPat() const;
-	int getPatIndex(int) const;
 	void addDoc();
-	void initPatient(Patient *, int);
 	void readRecord(ifstream &);
 	void writeRecord(fstream &, int) const;
 	void display(int) const;
