@@ -48,7 +48,7 @@ public:
 	Patient *getPatient() const;
 	string getPatientName() const;
 	string getDoctorName() const;
-	string getRoomDoc() const;
+	string getDocName() const;
 	bool getIsOccupied() const;
 	string getAvail() const;
 	double getRate() const;
@@ -142,7 +142,7 @@ string Ward::getPatientName() const
 	else
 		return "-";
 }
-string Ward::getRoomDoc() const
+string Ward::getDocName() const
 {
 	string s = "(";
 	if (doctor != NULL)
@@ -163,10 +163,10 @@ bool Ward::getIsOccupied() const
 string Ward::getAvail() const
 {
 	string s = "";
-	if (doctor != NULL)
+	if (patient == NULL && doctor != NULL)
 	{
 		s += "Available ";
-		s += getRoomDoc();
+		s += getDocName();
 		s += "";
 		return s;
 	}
@@ -176,7 +176,7 @@ string Ward::getAvail() const
 	{
 		s += getPatientName();
 		s += " ";
-		s += getRoomDoc();
+		s += getDocName();
 		s += "";
 		return s;
 	}
@@ -400,7 +400,7 @@ int main()
 							else
 							{
 								cout << "Room " << chr << " is stationed by " << ward[wardNo].getDoctorName() << endl;
-								cout << "Please enter another room: ";
+								cout << "Please enter another room => ";
 								cin >> chr;
 								chr = toupper(chr);
 							}
@@ -453,67 +453,13 @@ int main()
 							wIndex = i;
 					pat[patNo].display();
 					if (pat[patNo].getIsAssigned())
-						cout << "\tAssigned to room " << 'A' + wIndex << endl << endl;
+						cout << "\tAssigned to room " << (char)('A' + wIndex) << endl << endl;
 					else
-						cout << "\tNot assigned to any doctor." << endl << endl;
+						cout << "\tNot assigned to any room." << endl << endl;
 
 					patMenu(2);
-					choice = promptInput(username, 1, 4);
-					//if (choice == 1)  // change room
-					//{
 
-					//	int temp;
-					//	if (pat[patNo].getAssigned() == false)
-					//	{
-					//		cout << pat[patNo].getName() << " is not assigned to any doctor." << endl << endl;
-					//		docList(doc);
-					//		if (Doctor::doc_NUM != 0)
-					//		{
-					//			cout << endl << "Assign to doctor number => ";
-					//			temp = checkNum(0, Doctor::doc_NUM);
-					//			temp--;
-					//			doc[temp].setPatient(&pat[patNo], patNo);
-					//			cout << pat[patNo].getName() << " assigned to Dr " << doc[temp].getName() << endl;
-					//		}
-					//	}
-					//	else
-					//	{
-					//		docList(doc);
-					//		if (Doctor::doc_NUM != 0)
-					//		{
-					//			cout << endl << "Assign to doctor number => ";
-					//			temp = checkNum(0, Doctor::doc_NUM);
-					//			temp--;
-					//			if (temp == di)
-					//			{
-					//				cout << "Already assigned to " << doc[di].getName() << endl;
-					//			}
-					//			else
-					//			{
-					//				if (pi + 1 < doc[di].getNoPat())
-					//				{
-					//					doc[di].patient[pi] = NULL;
-					//					doc[di].patIndex[pi] = 0;
-					//					for (int i = pi; i < doc[di].getNoPat() - 1; i++)
-					//					{
-					//						doc[di].patient[i] = doc[di].patient[i + 1];
-					//						doc[di].patIndex[i] = doc[di].patIndex[i + 1];
-					//					}
-					//					doc[di].noPat--;
-					//				}
-					//				else
-					//				{
-					//					doc[di].patient[pi] = NULL;
-					//					doc[di].noPat--;
-					//					doc[di].patIndex[pi] = 0;
-					//				}
-					//				doc[temp].setPatient(&pat[patNo], patNo);
-					//				cout << pat[patNo].getName() << " assigned to Dr " << doc[temp].getName() << endl;
-					//			}
-					//		}
-					//	}
-					//	pressEnter(1);
-					//}
+					choice = promptInput(username, 1, 4);
 					if (choice == 1)  // set / change room
 					{
 						if (pat[patNo].getIsAssigned() == false)
@@ -522,7 +468,7 @@ int main()
 						}
 						else
 						{
-							cout << "Patient " << pat[patNo].getName() << "is in room ";
+							cout << "Patient " << pat[patNo].getName() << " is in room ";
 							cout << (char)('A' + wIndex) << endl << endl;
 							ward[wIndex].releasePat();
 						}
@@ -551,7 +497,14 @@ int main()
 							else
 							{
 								wardNo = chr - 'A';
-								if (ward[wardNo].getIsOccupied() == 0)
+								if (ward[wardNo].getIsStationed() == 0)
+								{
+									cout << "No doctors in room " << chr << endl;
+									cout << "Please enter another room =>";
+									cin >> chr;
+									chr = toupper(chr);
+								}
+								else if (ward[wardNo].getIsOccupied() == 0)
 								{
 									ward[wardNo].setPatient(&pat[patNo]);
 									cout << pat[patNo].getName() << " assinged to room " << chr << endl;
@@ -561,7 +514,7 @@ int main()
 								else
 								{
 									cout << "Room " << chr << " is occupied by " << ward[wardNo].getPatient()->getName() << endl;
-									cout << "Please enter another room: ";
+									cout << "Please enter another room => ";
 									cin >> chr;
 									chr = toupper(chr);
 								}
@@ -585,28 +538,6 @@ int main()
 								{
 									ward[i].releasePat();
 								}
-								//if (ward[i].getPatient() > &pat[patNo])  // adjust ward ptr
-								//{
-								//	ward[i].patientPtrAdjust();
-								//}
-							}
-							//for (int i = patNo; i < Patient::pat_NUM; i++)
-							//{
-							//	pat[i] = pat[i + 1];
-							//}
-							//Patient::pat_NUM--;
-
-							for (int i = 0; i < Doctor::doc_NUM; i++)
-							{
-/*								for (int j = 0; j < doc[i].getNoPat(); j++)
-								{
-									if (doc[i].patIndex[j] > patNo && pass == false)
-										doc[i].patIndex[j]--;
-									cout << doc[i].getName() << (doc[i].getPatIndex(j));
-									doc[i].initPatient(&pat[(doc[i].getPatIndex(j))], j);
-									cout << doc[i].patient[j]->getName();
-
-								}*/
 							}
 							cout << "Patient discharged." << endl;
 						}
@@ -649,7 +580,14 @@ int main()
 					else
 					{
 						wardNo = chr - 'A';
-						if (ward[wardNo].getIsOccupied() == 0)
+						if (ward[wardNo].getIsStationed() == 0)
+						{
+							cout << "No doctors in room " << chr << endl;
+							cout << "Please enter another room => ";
+							cin >> chr;
+							chr = toupper(chr);
+						}
+						else if (ward[wardNo].getIsOccupied() == 0)
 						{
 							ward[wardNo].setPatient(&pat[Patient::pat_NUM]);
 							cout << pat[Patient::pat_NUM].getName() << " assinged to room " << chr << endl;
@@ -659,7 +597,7 @@ int main()
 						else
 						{
 							cout << "Room " << chr << " is occupied by " << ward[wardNo].getPatient()->getName() << endl;
-							cout << "Please enter another room: ";
+							cout << "Please enter another room => ";
 							cin >> chr;
 							chr = toupper(chr);
 						}
@@ -725,10 +663,9 @@ void patMenu(int select)
 	else if (select == 2)
 	{
 		cout << "  Please select an option" << endl
-			<< "  1. Set / change doctor" << endl
-			<< "  2. Set / change room" << endl
-			<< "  3. Discharge patient" << endl
-			<< "  4. Go back" << endl << endl;
+			<< "  1. Set / change room" << endl
+			<< "  2. Discharge patient" << endl
+			<< "  3. Go back" << endl << endl;
 	}
 }
 
@@ -882,9 +819,9 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat)
 		}
 		if (i == 3)
 		{
-			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[0].getRoomDoc(), 18, 0) << "*" 
-				<< allignMid(ward[1].getRoomDoc(), 18, 0) << "*" << allignMid(ward[2].getRoomDoc(), 18, 0) << "*" 
-				<< allignMid(ward[3].getRoomDoc(), 18, 0) << "*" << "    |" << endl;
+			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[0].getDocName(), 18, 0) << "*" 
+				<< allignMid(ward[1].getDocName(), 18, 0) << "*" << allignMid(ward[2].getDocName(), 18, 0) << "*" 
+				<< allignMid(ward[3].getDocName(), 18, 0) << "*" << "    |" << endl;
 		}
 		cout << "\t|" << repeat(" ", 17) << '*' << repeat(" ", 18) << "*" << repeat(" ", 18)
 			 << "*"<< repeat (" ",18) << "*" << repeat(" ", 18) << "*" << "    |" << endl;
@@ -896,7 +833,7 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat)
 	wCount = waitingList(pat, s);
 	for (int i = 0; i < 5; i++)
 	{
-		cout << "\t| " << allignMid(s[i], 17, 1) << repeat(" ", 80) << "|" << endl;
+		cout << "\t| " << i+1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 80) << "|" << endl;
 	}
 	if (wCount > 5)
 	{
@@ -918,9 +855,9 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat)
 		}
 		if (i == 3)
 		{
-			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[4].getRoomDoc(), 18, 0) << "*" 
-				<< allignMid(ward[5].getRoomDoc(), 18, 0) << "*" << allignMid(ward[6].getRoomDoc(), 18, 0) << "*" 
-				<< allignMid(ward[7].getRoomDoc(), 18, 0) << "*" << "    |" << endl;
+			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[4].getDocName(), 18, 0) << "*" 
+				<< allignMid(ward[5].getDocName(), 18, 0) << "*" << allignMid(ward[6].getDocName(), 18, 0) << "*" 
+				<< allignMid(ward[7].getDocName(), 18, 0) << "*" << "    |" << endl;
 		}
 		cout << "\t|" << repeat(" ", 17) << '*' << repeat(" ", 18) << "*" << repeat(" ", 18)
 			 << "*"<< repeat (" ",18) << "*" << repeat(" ", 18) << "*" << "    |" << endl;
