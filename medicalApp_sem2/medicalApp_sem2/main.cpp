@@ -8,6 +8,7 @@
 #include "Person.h"
 using namespace std;
 
+int waitingList(Patient *, string *);
 void printLine(int);
 int promptInput(string, int, int);
 void pressEnter(bool);
@@ -21,7 +22,7 @@ void findPatientInDoc(Doctor *, Patient *, int, int &, int &);
 void docList(Doctor *);
 void patList(Patient *);
 void patMenu(int);
-void deleteDoc(Doctor *, Ward *);
+//void deleteDoc(Doctor *, Ward *);
 void saveDoc(fstream &, Doctor*);
 void savePat(fstream &, Patient *);
 
@@ -43,9 +44,10 @@ public:
 	void patientPtrAdjust();
 
 	bool getIsStationed() const;
-	Doctor *getDoctor();
+	//Doctor *getDoctor();
 	Patient *getPatient() const;
 	string getPatientName() const;
+	string getDoctorName() const;
 	string getRoomDoc() const;
 	bool getIsOccupied() const;
 	string getAvail() const;
@@ -55,7 +57,13 @@ public:
 	friend void printWard();
 };
 
-
+string Ward::getDoctorName() const
+{
+	if (doctor == NULL)
+		return "-";
+	else
+		return doctor->getName();
+}
 void Ward::releasePat() 
 {
 	isOccupied = false;
@@ -75,6 +83,7 @@ Ward::Ward()
 	patient = NULL;
 	doctor = NULL;
 	isOccupied = false;
+	isStationed = false;
 	rate = 0;
 }
 void Ward::setPatient(Patient *p)
@@ -115,11 +124,11 @@ bool Ward::getIsStationed() const
 	return isStationed;
 }
 
-Doctor * Ward::getDoctor()
-{
-	return doctor;
-}
-
+//Doctor * Ward::getDoctor()
+//{
+//	return doctor;
+//}
+//
 Patient * Ward::getPatient() const
 {
 	return patient;
@@ -135,8 +144,6 @@ string Ward::getPatientName() const
 }
 string Ward::getRoomDoc() const
 {
-	int index = 0;
-	int docIndex, tmp;
 	string s = "(";
 	if (doctor != NULL)
 	{
@@ -155,10 +162,24 @@ bool Ward::getIsOccupied() const
 
 string Ward::getAvail() const
 {
-	if (patient == NULL)
-		return "Available";
+	string s = "";
+	if (doctor != NULL)
+	{
+		s += "Available ";
+		s += getRoomDoc();
+		s += "";
+		return s;
+	}
+	else if (doctor == NULL)
+		return "No doctor";
 	else
-		return getPatientName();
+	{
+		s += getPatientName();
+		s += " ";
+		s += getRoomDoc();
+		s += "";
+		return s;
+	}
 }
 
 double Ward::getRate() const
@@ -172,10 +193,33 @@ string repeat(string a, int max)
 		s += a;
 	return s;
 }
-string allignMid(string s, int width)
+string allignMid(string s, int width, int mod)
 {
 	int length = s.length();
 	string result = "";
+	if (mod == 1)
+	{
+		if (length > width)
+		{
+			for (int i = 0; i < width - 2; i++)
+			{
+				result += s[i];
+			}
+			result += "..";
+			return result;
+		}
+		else
+		{
+			int pad = width - length;
+			string padding(pad , ' ');
+			for (int i = 0; i < (width - length); i++)
+			{
+				result += s;
+				result += padding;
+				return result;
+			}
+		}
+	}
 	if (length < width)
 	{
 		int pad = width - length;
@@ -246,13 +290,22 @@ int main()
 		cout << "Creating ward.txt..." << endl;
 	else
 	{
-		string inName;
+		string docName;
+		string patName;
 		for (int i = 0; i < 8; i++)
 		{
-			getline(inp, inName);
+			getline(inp, docName, ',');
+			getline(inp, patName);
+			for (int j = 0; j < Doctor::doc_NUM; j++)
+			{
+				if (doc[j].getName() == docName)
+				{
+					ward[i].setDoctor(&doc[j]);
+				}
+			}
 			for (int j = 0; j < Patient::pat_NUM; j++)
 			{
-				if (pat[j].getName() == inName)
+				if (pat[j].getName() == patName)
 				{
 					ward[i].setPatient(&pat[j]);
 				}
@@ -341,18 +394,19 @@ int main()
 							{
 								ward[wardNo].setDoctor(&doc[Doctor::doc_NUM]);
 								cout << doc[Doctor::doc_NUM].getName() << " stationed to room " << chr << endl;
-								cout << "gg" << wardNo << ward[wardNo].getDoctor()->getName();
+								cout << "gg" << wardNo << ward[wardNo].getDoctorName();
 								break;
 							}
 							else
 							{
-								cout << "Room " << chr << " is stationed by " << ward[wardNo].getDoctor()->getName() << endl;
+								cout << "Room " << chr << " is stationed by " << ward[wardNo].getDoctorName() << endl;
 								cout << "Please enter another room: ";
 								cin >> chr;
 								chr = toupper(chr);
 							}
 						}
 					}
+					Doctor::doc_NUM++;
 				}
 				pressEnter(1);
 			}
@@ -360,7 +414,7 @@ int main()
 			{
 				if (Doctor::doc_NUM != 0)
 				{
-					deleteDoc(doc);
+					//deleteDoc(doc);
 				}
 				else
 				{
@@ -460,7 +514,7 @@ int main()
 					//	}
 					//	pressEnter(1);
 					//}
-					if (choice == 2)  // set / change room
+					if (choice == 1)  // set / change room
 					{
 						if (pat[patNo].getIsAssigned() == false)
 						{
@@ -469,17 +523,12 @@ int main()
 						else
 						{
 							cout << "Patient " << pat[patNo].getName() << "is in room ";
-							for (int i = 0; i < 8; i++)
-							{
-								if (ward[i].getPatient() == &pat[patNo])
-								{
-									cout << 'A' + i << endl << endl;
-								}
-							}
+							cout << (char)('A' + wIndex) << endl << endl;
+							ward[wIndex].releasePat();
 						}
 						printWardAvail(ward);
 						cout << "Assign " << pat[patNo].getName() << " to room (A - H)" << endl
-							<< "Enter 'Z' to assign later " << " => ";
+							<< "Enter 'Z' to add to waiting list " << " => ";
 						char chr;
 						int wardNo;
 						cin >> chr;
@@ -487,14 +536,15 @@ int main()
 						while (cin)
 						{
 							if (chr != 'A' && chr != 'B' && chr != 'C' && chr != 'D' &&
-								chr != 'E' && chr != 'F' && chr != 'G' && chr != 'H')
+								chr != 'E' && chr != 'F' && chr != 'G' && chr != 'H' && chr != 'Z')
 							{
 								cout << "Please enter correct room => ";
 								cin >> chr;
 								chr = toupper(chr);
 							}
-							else if (chr == 'Z')
+							if (chr == 'Z')
 							{
+								pat[patNo].setIsAssigned(false);
 								cout << pat[patNo].getName() << " added to waiting list." << endl;
 								break;
 							}
@@ -584,16 +634,17 @@ int main()
 				while (cin)
 				{
 					if (chr != 'A' && chr != 'B' && chr != 'C' && chr != 'D' &&
-						chr != 'E' && chr != 'F' && chr != 'G' && chr != 'H')
+						chr != 'E' && chr != 'F' && chr != 'G' && chr != 'H' && chr != 'Z')
 					{
 						cout << "Please enter correct room => ";
 						cin >> chr;
 						chr = toupper(chr);
 					}
-					else if (chr == 'Z')
+					 if (chr == 'Z')
 					{
-						cout << pat[Patient::pat_NUM].getName() << " not assigned to any room" << endl;
-						break;
+						 pat[Patient::pat_NUM].setIsAssigned(false);
+						 cout << pat[Patient::pat_NUM].getName() << " added to waiting list." << endl;
+						 break;
 					}
 					else
 					{
@@ -636,7 +687,7 @@ int main()
 	savePat(out, pat);
 	out.open("ward.txt", ios::out);
 	for (int i = 0; i < 8; i++)
-		out << ward[i].getPatientName() << endl;
+		out << ward[i].getDoctorName() << "," << ward[i].getPatientName() << endl;
 	out.close();
 	return 0;
 }
@@ -753,28 +804,28 @@ int promptInput(string username, int min, int max)
 }
 
 
-void deleteDoc(Doctor *d, Ward *ward, int wIndex)
-{
-	cout << "Remove doctor number: ";
-	int docNo = checkNum(0, Doctor::doc_NUM);
-	docNo--;
-	cout << "Confirm to remove '" << d[docNo].getName() << "' from system? (Y / n): ";
-	string yesno;
-	cin >> yesno;
-	if (yesno == "Y")
-	{
-		for (int i = docNo; i < Doctor::doc_NUM; i++)
-		{
-			d[i] = d[i + 1];
-		}
-		Doctor::doc_NUM--;
-		cout << "Record removed." << endl;
-	}
-	else
-		cout << "Record not removed." << endl;
-	cout << endl;
-	pressEnter(1);
-}
+//void deleteDoc(Doctor *d, Ward *ward, int wIndex)
+//{
+//	cout << "Remove doctor number: ";
+//	int docNo = checkNum(0, Doctor::doc_NUM);
+//	docNo--;
+//	cout << "Confirm to remove '" << d[docNo].getName() << "' from system? (Y / n): ";
+//	string yesno;
+//	cin >> yesno;
+//	if (yesno == "Y")
+//	{
+//		for (int i = docNo; i < Doctor::doc_NUM; i++)
+//		{
+//			d[i] = d[i + 1];
+//		}
+//		Doctor::doc_NUM--;
+//		cout << "Record removed." << endl;
+//	}
+//	else
+//		cout << "Record not removed." << endl;
+//	cout << endl;
+//	pressEnter(1);
+//}
 
 void pressEnter(bool skip)
 {
@@ -825,39 +876,51 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat)
 	{
 		if (i == 2)
 		{
-			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[0].getPatientName(), 18) << "*" 
-				<< allignMid(ward[1].getPatientName() , 18) << "*" << allignMid(ward[2].getPatientName(), 18) << "*" 
-				<< allignMid(ward[3].getPatientName(), 18) << "*" << "    |" << endl;
+			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[0].getPatientName(), 18, 0) << "*" 
+				<< allignMid(ward[1].getPatientName() , 18, 0) << "*" << allignMid(ward[2].getPatientName(), 18, 0) << "*" 
+				<< allignMid(ward[3].getPatientName(), 18, 0) << "*" << "    |" << endl;
 		}
 		if (i == 3)
 		{
-			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[0].getRoomDoc(), 18) << "*" 
-				<< allignMid(ward[1].getRoomDoc(), 18) << "*" << allignMid(ward[2].getRoomDoc(), 18) << "*" 
-				<< allignMid(ward[3].getRoomDoc(), 18) << "*" << "    |" << endl;
+			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[0].getRoomDoc(), 18, 0) << "*" 
+				<< allignMid(ward[1].getRoomDoc(), 18, 0) << "*" << allignMid(ward[2].getRoomDoc(), 18, 0) << "*" 
+				<< allignMid(ward[3].getRoomDoc(), 18, 0) << "*" << "    |" << endl;
 		}
 		cout << "\t|" << repeat(" ", 17) << '*' << repeat(" ", 18) << "*" << repeat(" ", 18)
 			 << "*"<< repeat (" ",18) << "*" << repeat(" ", 18) << "*" << "    |" << endl;
 	}
 	cout << "\t|" << repeat(" ", 17) << repeat("* ", 39) << "   |" << endl;
 	cout << "\t|" << " Waiting Area" << repeat(" ", 85) << "|" << endl;
-	for (int i = 0; i < 6; i++)
+	string s[20];
+	int wCount;
+	wCount = waitingList(pat, s);
+	for (int i = 0; i < 5; i++)
 	{
-		cout << "\t|" << repeat(" ", 98) << "|" << endl;
+		cout << "\t| " << allignMid(s[i], 17, 1) << repeat(" ", 80) << "|" << endl;
+	}
+	if (wCount > 5)
+	{
+		int tmp = wCount - 5;
+		string overFlow = to_string(tmp);
+		string cat = "+ ";
+		cat += overFlow;
+		cat += " more";
+		cout << "\t|" << allignMid(cat , 17, 0) << repeat(" ", 81) << "|" << endl;
 	}
 	cout << "\t|" << repeat(" ", 17) << repeat("* ", 39) << "   |" << endl;
 	for (int i = 0; i < 5; i++)
 	{
 		if (i == 2)
 		{
-			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[4].getPatientName(), 18) << "*" 
-				<< allignMid(ward[5].getPatientName(), 18) << "*" << allignMid(ward[6].getPatientName(), 18) << "*" 
-				<< allignMid(ward[7].getPatientName(), 18) << "*" << "    |" << endl;
+			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[4].getPatientName(), 18, 0) << "*" 
+				<< allignMid(ward[5].getPatientName(), 18, 0) << "*" << allignMid(ward[6].getPatientName(), 18, 0) << "*" 
+				<< allignMid(ward[7].getPatientName(), 18, 0) << "*" << "    |" << endl;
 		}
 		if (i == 3)
 		{
-			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[4].getRoomDoc(), 18) << "*" 
-				<< allignMid(ward[5].getRoomDoc(), 18) << "*" << allignMid(ward[6].getRoomDoc(), 18) << "*" 
-				<< allignMid(ward[7].getRoomDoc(), 18) << "*" << "    |" << endl;
+			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[4].getRoomDoc(), 18, 0) << "*" 
+				<< allignMid(ward[5].getRoomDoc(), 18, 0) << "*" << allignMid(ward[6].getRoomDoc(), 18, 0) << "*" 
+				<< allignMid(ward[7].getRoomDoc(), 18, 0) << "*" << "    |" << endl;
 		}
 		cout << "\t|" << repeat(" ", 17) << '*' << repeat(" ", 18) << "*" << repeat(" ", 18)
 			 << "*"<< repeat (" ",18) << "*" << repeat(" ", 18) << "*" << "    |" << endl;
@@ -873,4 +936,18 @@ void dischargePat(Ward *ward, Patient *pat, int wIndex)
 	ward[wIndex].setPatient(NULL);
 	ward[wIndex].setIsOccupied(false);
 	pat->setIsAssigned(false);
+}
+int waitingList(Patient *pat, string *s)
+{
+	int count = 0;
+	for (int i = 0; i < Patient::pat_NUM; i++)
+	{
+		if (!pat[i].getIsAssigned() && pat[i].getIsAdmit())
+		{
+			s[count] = pat[i].getName();
+			count++;
+		}
+
+	}
+	return count;
 }

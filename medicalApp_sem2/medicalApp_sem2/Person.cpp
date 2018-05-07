@@ -21,6 +21,7 @@ string Contact::getEmail() const { return email; }
 
 Person::Person()
 {
+	isAssigned = false;
 	name = "";
 	ic = "";
 	gender = "";
@@ -116,7 +117,7 @@ Patient::Patient()
 	condition = "";
 	height = 0;
 	weight = 0;
-	isAssigned = false;
+	isAdmit = false;
 }
 void Patient::addPat()
 {
@@ -231,7 +232,6 @@ Doctor::Doctor()
 }
 void Doctor::addDoc()
 {
-	doc_NUM++;
 	cout << "New employee" << endl
 		<< endl;
 	readBasic();
