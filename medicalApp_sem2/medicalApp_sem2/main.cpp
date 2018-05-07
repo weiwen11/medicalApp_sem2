@@ -41,10 +41,10 @@ public:
 	void setIsStationed(bool);
 	void setDoctor(Doctor *);
 	void setRate(double);
-	void patientPtrAdjust();
+	void doctorPtrAdjust();
 
 	bool getIsStationed() const;
-	//Doctor *getDoctor();
+	Doctor *getDoctor();
 	Patient *getPatient() const;
 	string getPatientName() const;
 	string getDoctorName() const;
@@ -114,9 +114,9 @@ void Ward::setRate(double r)
 	rate = r;
 }
 
-void Ward::patientPtrAdjust()
+void Ward::doctorPtrAdjust()
 {
-	patient--;
+	doctor--;
 }
 
 bool Ward::getIsStationed() const
@@ -124,11 +124,11 @@ bool Ward::getIsStationed() const
 	return isStationed;
 }
 
-//Doctor * Ward::getDoctor()
-//{
-//	return doctor;
-//}
-//
+Doctor * Ward::getDoctor()
+{
+	return doctor;
+}
+
 Patient * Ward::getPatient() const
 {
 	return patient;
@@ -253,6 +253,7 @@ int main()
 	cout << fixed << setprecision(2);
 	Doctor doc[20];
 	Patient pat[MAX];
+	Patient *admit[MAX];
 	Ward ward[9];
 
 	// input doctor and patient data
@@ -373,7 +374,7 @@ int main()
 					}*/
 					printWardAvail(ward);
 
-					cout << "Assign " << doc[Doctor::doc_NUM].getName() << " to room (A - H) => " << endl;
+					cout << "Assign " << doc[Doctor::doc_NUM].getName() << " to room (A - H) => ";
 					char chr;
 					int wardNo;
 					cin >> chr;
@@ -415,12 +416,60 @@ int main()
 				if (Doctor::doc_NUM != 0)
 				{
 					//deleteDoc(doc);
+					cout << "Remove doctor number => ";
+					int docNo = checkNum(0, Doctor::doc_NUM);
+					docNo--;
+					int wIndex;
+					for (int i = 0; i < 8; i++)
+					{
+						if (ward[i].getDoctor() == &doc[docNo])
+						{
+							wIndex = i;
+						}
+
+					}
+					if (ward[wIndex].getIsOccupied() == true)
+					{
+						cout << "Error removing doctor." << endl;
+						cout << "Discharge patient " << ward[wIndex].getPatientName() << " first before removing doctor." << endl
+							<< endl;
+					}
+					else
+					{
+						cout << "Confirm to remove '" << doc[docNo].getName() << "'? (Y / n): ";
+						string yesno;
+						cin >> yesno;
+						if (yesno == "Y")
+						{
+							for (int i = 0; i < 8; i++)
+							{
+								if (ward[i].getDoctor() > &doc[docNo])
+								{
+									ward[i].doctorPtrAdjust();
+								}
+							}
+
+							ward[wIndex].setIsStationed(false);
+							ward[wIndex].releaseDoc();
+							for (int i = docNo; i < Doctor::doc_NUM; i++)
+							{
+								doc[i] = doc[i + 1];
+							}
+							cout << "Record removed." << endl << endl;
+							Doctor::doc_NUM--;
+						}
+						else
+						{
+							cout << "Doctor " << doc[docNo].getName() << " not removed." << endl << endl;
+						}
+					}
 				}
 				else
 				{
 					cout << "No record found. ";
 					pressEnter(1);
 				}
+				pressEnter(1);
 			}
 			else if (choice == 4) // go back
 			{
@@ -436,23 +485,34 @@ int main()
 			patList(pat);
 
 			patMenu(1);
+			int admitCount = 0;
+			for (int i = 0; i < MAX; i++)
+				admit[i] = NULL;
+			for (int i = 0; i < Patient::pat_NUM; i++)
+			{
+				if (pat[i].getIsAdmit())
+				{
+					admit[admitCount] = &pat[i];
+					admitCount++;
+				}
+			}
 			choice = promptInput(username, 1, 3);
 			if (choice == 1)  // selected patient
 			{
-				if (Patient::pat_NUM == 0)
-					cout << "No patients found." << endl << endl;
+				if (admitCount == 0)
+					cout << "No patients admitted." << endl << endl;
 				else
 				{
 					cout << "Enter patient's number => ";
-					int patNo = checkNum(0, Patient::pat_NUM);
+					int patNo = checkNum(0, admitCount);
 					patNo--;
 					int wIndex;
 
 					for (int i = 0; i < 8; i++)
-						if (ward[i].getPatient() == &pat[patNo])
+						if (ward[i].getPatient() == admit[patNo])
 							wIndex = i;
-					pat[patNo].display();
-					if (pat[patNo].getIsAssigned())
+					admit[patNo]->display();
+					if (admit[patNo]->getIsAssigned())
 						cout << "\tAssigned to room " << (char)('A' + wIndex) << endl << endl;
 					else
 						cout << "\tNot assigned to any room." << endl << endl;
@@ -462,18 +522,18 @@ int main()
 					choice = promptInput(username, 1, 4);
 					if (choice == 1)  // set / change room
 					{
-						if (pat[patNo].getIsAssigned() == false)
+						if (admit[patNo]->getIsAssigned() == false)
 						{
-							cout << "Patient " << pat[patNo].getName() << " is not assigned to any room." << endl << endl;
+							cout << "Patient " << admit[patNo]->getName() << " is not assigned to any room." << endl << endl;
 						}
 						else
 						{
-							cout << "Patient " << pat[patNo].getName() << " is in room ";
+							cout << "Patient " << admit[patNo]->getName() << " is in room ";
 							cout << (char)('A' + wIndex) << endl << endl;
 							ward[wIndex].releasePat();
 						}
 						printWardAvail(ward);
-						cout << "Assign " << pat[patNo].getName() << " to room (A - H)" << endl
+						cout << "Assign " << admit[patNo]->getName() << " to room (A - H)" << endl
 							<< "Enter 'Z' to add to waiting list " << " => ";
 						char chr;
 						int wardNo;
@@ -490,8 +550,8 @@ int main()
 							}
 							if (chr == 'Z')
 							{
-								pat[patNo].setIsAssigned(false);
-								cout << pat[patNo].getName() << " added to waiting list." << endl;
+								admit[patNo]->setIsAssigned(false);
+								cout << admit[patNo]->getName() << " added to waiting list." << endl;
 								break;
 							}
 							else
@@ -506,8 +566,8 @@ int main()
 								}
 								else if (ward[wardNo].getIsOccupied() == 0)
 								{
-									ward[wardNo].setPatient(&pat[patNo]);
-									cout << pat[patNo].getName() << " assinged to room " << chr << endl;
+									ward[wardNo].setPatient(admit[patNo]);
+									cout << admit[patNo]->getName() << " assinged to room " << chr << endl;
 									cout << "gg" << wardNo << ward[wardNo].getPatient()->getName();
 									break;
 								}
@@ -520,21 +580,22 @@ int main()
 								}
 							}
 						}
+						pressEnter(1);
 
 					}
-					else if (choice == 3) // discharge patient
+					else if (choice == 2) // discharge patient
 					{
-						cout << "Confirm to discharge '" << pat[patNo].getName() << "'? (Y / n): ";
+						cout << "Confirm to discharge '" << admit[patNo]->getName() << "'? (Y / n): ";
 						string yesno;
 						cin >> yesno;
 						if (yesno == "Y")
 						{
-							cout << pat[patNo].getIsAssigned();
-							pat[patNo].setIsAssigned(false);
-							pat[patNo].setIsAdmit(false);
+							cout << admit[patNo]->getIsAssigned();
+							admit[patNo]->setIsAssigned(false);
+							admit[patNo]->setIsAdmit(false);
 							for (int i = 0; i < 8; i++) 
 							{
-								if (ward[i].getPatient() == &pat[patNo])  // finds patient's room and set it NULL
+								if (ward[i].getPatient() == admit[patNo])  // finds patient's room and set it NULL
 								{
 									ward[i].releasePat();
 								}
@@ -683,13 +744,15 @@ void patList(Patient * p)
 {
 	cout << "List of patients admitted" << endl;
 	printLine(1);
+	int count = 0;
 	if (Patient::pat_NUM == 0)
 		cout << "No patients found." << endl;
 	for (int i = 0; i < Patient::pat_NUM; i++)
 	{
 		if (p[i].getIsAdmit() == true)
 		{
-			cout << i + 1 << ". " << p[i].getName() << endl;
+			cout << count + 1 << ". " << p[i].getName() << endl;
+			count++;
 		}
 	}
 	cout << endl;
@@ -827,8 +890,8 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat)
 			 << "*"<< repeat (" ",18) << "*" << repeat(" ", 18) << "*" << "    |" << endl;
 	}
 	cout << "\t|" << repeat(" ", 17) << repeat("* ", 39) << "   |" << endl;
-	cout << "\t|" << " Waiting Area" << repeat(" ", 85) << "|" << endl;
-	string s[20];
+	cout << "\t|" << allignMid("Waiting List:",17, 0) << repeat(" ", 81) << "|" << endl;
+	string s[MAX];
 	int wCount;
 	wCount = waitingList(pat, s);
 	for (int i = 0; i < 5; i++)
