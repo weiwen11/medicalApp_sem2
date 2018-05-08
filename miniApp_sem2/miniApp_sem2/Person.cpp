@@ -26,6 +26,14 @@ Person::Person()
 	ic = "";
 	gender = "";
 }
+bool Person::getIsAssigned()const
+{
+	return isAssigned;
+}
+void Person::setIsAssigned(bool a)
+{
+	isAssigned = a;
+}
 string Person::getName() const
 {
 	return name;
@@ -252,7 +260,7 @@ void Doctor::addDoc()
 	cout << endl;
 	readContact();
 	cout << endl;
-	cout << "Record Saved. ";
+	cout << "Record Saved. " << endl;
 }
 void Doctor::readRecord(ifstream &inp)
 {
