@@ -81,4 +81,33 @@ public:
 	friend void deleteDoc(Doctor *);
 	friend void unbindPatient(Doctor *, int, int, int);
 };
+class Ward
+{
+	bool isOccupied;
+	bool isStationed;
+	double rate;
+	Doctor *doctor;
+	Patient *patient;
+public:
+
+	Ward();
+	void setPatient(Patient *);
+	void setIsOccupied(bool);
+	void setIsStationed(bool);
+	void setDoctor(Doctor *);
+	void setRate(double);
+	void doctorPtrAdjust();
+
+	bool getIsStationed() const;
+	Doctor *getDoctor();
+	Patient *getPatient() const;
+	string getPatientName() const;
+	string getDoctorName() const;
+	string getDoctorNameInBracket() const;
+	bool getIsOccupied() const;
+	string getAvail() const;
+	double getRate() const;
+	void releasePat();
+	void releaseDoc();
+};
 #endif // !PERSON_H

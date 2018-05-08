@@ -8,320 +8,38 @@
 #include "Person.h"
 using namespace std;
 
-int waitingList(Patient *, string *);
+// General function
 void printLine(int);
-int promptInput(string, int, int);
 void pressEnter(bool);
 void displayMenu();
-void printAllDocInfo(Doctor  *);
-int checkNum(int, int);
 
+bool readAllData(ifstream &, Doctor *, Patient *, Ward *);
+int checkNum(int, int);
+int promptInput(string, int, int);
+int waitingList(Patient *, string *);
+string repeat(string, int);
+string allignMid(string , int , int );
+
+// Doctor's standalone function
 void doctorMenu();
 void docList(Doctor *);
+void printAllDocInfo(Doctor  *);
+void assignDoctor(Ward * ward, Doctor * doc);
+void deleteDoctor(Doctor * doc, int docNo, Ward * ward, int wIndex);
+void saveDoctor(ofstream &, Doctor *);
+
+// Patient's standalone function
 void patList(Patient *);
 void patMenu();
 void patMenu(int);
 void savePatient(ofstream &, Patient *);
-void saveDoctor(ofstream &, Doctor *);
-
-class Ward
-{
-	bool isOccupied;
-	bool isStationed;
-	double rate;
-	Doctor *doctor;
-	Patient *patient;
-public:
-
-	Ward();
-	void setPatient(Patient *);
-	void setIsOccupied(bool);
-	void setIsStationed(bool);
-	void setDoctor(Doctor *);
-	void setRate(double);
-	void doctorPtrAdjust();
-
-	bool getIsStationed() const;
-	Doctor *getDoctor();
-	Patient *getPatient() const;
-	string getPatientName() const;
-	string getDoctorName() const;
-	string getDocName() const;
-	bool getIsOccupied() const;
-	string getAvail() const;
-	double getRate() const;
-	void releasePat();
-	void releaseDoc();
-	friend void printWard();
-};
-
-string Ward::getDoctorName() const
-{
-	if (doctor == NULL)
-		return "-";
-	else
-		return doctor->getName();
-}
-void Ward::releasePat() 
-{
-	isOccupied = false;
-	patient->setIsAssigned(false);
-	patient = NULL;
-}
-
-void Ward::releaseDoc()
-{
-	isStationed = false;
-	doctor->setIsAssigned(false);
-	doctor = NULL;
-}
-
-Ward::Ward()
-{
-	patient = NULL;
-	doctor = NULL;
-	isOccupied = false;
-	isStationed = false;
-	rate = 0;
-}
-void Ward::setPatient(Patient *p)
-{
-	patient = p;
-	patient->setIsAssigned(true);
-	isOccupied = true;
-}
-
-void Ward::setIsOccupied(bool a)
-{
-	isOccupied = a;
-}
-
-void Ward::setIsStationed(bool i)
-{
-	isStationed = i;
-}
-
-void Ward::setDoctor(Doctor *d)
-{
-	doctor = d;
-	isStationed = true;
-}
-
-void Ward::setRate(double r)
-{
-	rate = r;
-}
-
-void Ward::doctorPtrAdjust()
-{
-	doctor--;
-}
-
-bool Ward::getIsStationed() const
-{
-	return isStationed;
-}
-
-Doctor * Ward::getDoctor()
-{
-	return doctor;
-}
-
-Patient * Ward::getPatient() const
-{
-	return patient;
-}
-string Ward::getPatientName() const
-{
-	if (patient != NULL)
-	{
-		return patient->getName();
-	}
-	else
-		return "-";
-}
-string Ward::getDocName() const
-{
-	string s = "(";
-	if (doctor != NULL)
-	{
-		s += doctor->getName();
-		s += ")";
-		return s;
-	}
-	else
-		return "";
-}
-
-bool Ward::getIsOccupied() const
-{
-	return isOccupied;
-}
-
-string Ward::getAvail() const
-{
-	string s = "";
-	if (patient == NULL && doctor != NULL)
-	{
-		s += "Available ";
-		s += getDocName();
-		s += "";
-		return s;
-	}
-	else if (doctor == NULL)
-		return "No doctor";
-	else
-	{
-		s += getPatientName();
-		s += " ";
-		s += getDocName();
-		s += "";
-		return s;
-	}
-}
-
-double Ward::getRate() const
-{
-	return rate;
-}
-
 void assignPatient(Patient *, Ward *);
-string repeat(string a, int max)
-{
-	string s = "";
-	for (int i = 0; i < max; i++)
-		s += a;
-	return s;
-}
-string allignMid(string s, int width, int mod)
-{
-	int length = s.length();
-	string result = "";
-	if (mod == 1)
-	{
-		if (length > width)
-		{
-			for (int i = 0; i < width - 2; i++)
-			{
-				result += s[i];
-			}
-			result += "..";
-			return result;
-		}
-		else
-		{
-			int pad = width - length;
-			string padding(pad , ' ');
-			for (int i = 0; i < (width - length); i++)
-			{
-				result += s;
-				result += padding;
-				return result;
-			}
-		}
-	}
-	if (length < width)
-	{
-		int pad = width - length;
-		string spaces(pad / 2, ' ');
-		result = spaces + s;
-		while (result.length() < (unsigned int)width)
-			result += " ";
-		return result;
-	}
-	else if (length > width)
-	{
-		for (int i = 0; i < width - 2; i++)
-		{
-			result += s[i];
-		}
-		result += "..";
-		return result;
-	}
-	else 
-	{
-		return s;
-	}
-}
+
+// Ward's standalone function
 void printWardAvail(Ward *);
 void printWard(Ward *, Doctor *, Patient *);
-bool readAllData(ifstream &inp, Doctor *doc, Patient *pat, Ward *ward)
-{
-	int fileCount = 0;
-	bool error = false;
-	inp.open("patient.txt");
-	if (!inp)
-	{
-		fileCount++;
-		cout << "Creating patient.txt..." << endl;
-	}
-	else
-	{
-		for (int i = 0; inp.good(); i++)
-			pat[i].readRecord(inp);
-	}
-	inp.close();
 
-	inp.open("doctor.txt");
-	if (!inp)
-	{
-		fileCount++;
-		cout << "Creating doctor.txt..." << endl;
-	}
-	else
-	{
-		for (int i = 0; inp.good(); i++)
-		{
-			doc[i].readRecord(inp);
-		}
-	}
-	inp.close();
-	inp.open("ward.txt");
-	if (!inp)
-	{
-		fileCount++;
-		cout << "Creating ward.txt..." << endl;
-	}
-	else
-	{
-		string docName;
-		string patName;
-		for (int i = 0; i < 8; i++)
-		{
-			getline(inp, docName, ',');
-			getline(inp, patName);
-			if (docName.empty())
-			{
-				break;
-			}
-			for (int j = 0; j < Doctor::doc_NUM; j++)
-			{
-				if (doc[j].getName() == docName)
-				{
-					ward[i].setDoctor(&doc[j]);
-				}
-			}
-			for (int j = 0; j < Patient::pat_NUM; j++)
-			{
-				if (pat[j].getName() == patName)
-				{
-					ward[i].setPatient(&pat[j]);
-				}
-			}
-		}
-	}
-	inp.close();
-	if (fileCount != 3 && fileCount != 0)
-	{
-		error = true;
-	}
-	return error;
-}
 const int MAX = 1000;
-
-void assignDoctor(Ward * ward, Doctor * doc);
-void deleteDoctor(Doctor * doc, int docNo, Ward * ward, int wIndex);
-
 int main()
 {
 	string username = "weiwen";
@@ -331,9 +49,9 @@ int main()
 	Patient *admit[MAX];
 	Ward ward[9];
 
-	// input doctor and patient data
 	ifstream inp;
 	ofstream out;
+	// input doctor and patient and ward data
 	bool error = readAllData(inp, doc, pat, ward);
 	if (error)
 	{
@@ -350,10 +68,10 @@ int main()
 			out.open("ward.txt");
 			out.close();
 			cout << "Previous data deleted. Please restart the program now." << endl;
-			exit(1);
+			return 0;
 		}
 		else
-			exit(1);
+			return 0;
 	}
 	
 
@@ -500,7 +218,6 @@ int main()
 						cin >> yesno;
 						if (yesno == "Y")
 						{
-							cout << admit[patNo]->getIsAssigned();
 							admit[patNo]->setIsAssigned(false);
 							admit[patNo]->setIsAdmit(false);
 							for (int i = 0; i < 8; i++) 
@@ -800,9 +517,9 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat)
 		}
 		if (i == 3)
 		{
-			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[0].getDocName(), 18, 0) << "*" 
-				<< allignMid(ward[1].getDocName(), 18, 0) << "*" << allignMid(ward[2].getDocName(), 18, 0) << "*" 
-				<< allignMid(ward[3].getDocName(), 18, 0) << "*" << "    |" << endl;
+			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[0].getDoctorNameInBracket(), 18, 0) << "*" 
+				<< allignMid(ward[1].getDoctorNameInBracket(), 18, 0) << "*" << allignMid(ward[2].getDoctorNameInBracket(), 18, 0) << "*" 
+				<< allignMid(ward[3].getDoctorNameInBracket(), 18, 0) << "*" << "    |" << endl;
 		}
 		cout << "\t|" << repeat(" ", 17) << '*' << repeat(" ", 18) << "*" << repeat(" ", 18)
 			 << "*"<< repeat (" ",18) << "*" << repeat(" ", 18) << "*" << "    |" << endl;
@@ -836,9 +553,9 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat)
 		}
 		if (i == 3)
 		{
-			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[4].getDocName(), 18, 0) << "*" 
-				<< allignMid(ward[5].getDocName(), 18, 0) << "*" << allignMid(ward[6].getDocName(), 18, 0) << "*" 
-				<< allignMid(ward[7].getDocName(), 18, 0) << "*" << "    |" << endl;
+			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[4].getDoctorNameInBracket(), 18, 0) << "*" 
+				<< allignMid(ward[5].getDoctorNameInBracket(), 18, 0) << "*" << allignMid(ward[6].getDoctorNameInBracket(), 18, 0) << "*" 
+				<< allignMid(ward[7].getDoctorNameInBracket(), 18, 0) << "*" << "    |" << endl;
 		}
 		cout << "\t|" << repeat(" ", 17) << '*' << repeat(" ", 18) << "*" << repeat(" ", 18)
 			 << "*"<< repeat (" ",18) << "*" << repeat(" ", 18) << "*" << "    |" << endl;
@@ -919,4 +636,133 @@ void assignPatient(Patient *pat, Ward *ward)
 			}
 		}
 	}
+}
+bool readAllData(ifstream &inp, Doctor *doc, Patient *pat, Ward *ward)
+{
+	int fileCount = 0;
+	bool error = false;
+	inp.open("patient.txt");
+	if (!inp)
+	{
+		fileCount++;
+		cout << "Creating patient.txt..." << endl;
+	}
+	else
+	{
+		for (int i = 0; inp.good(); i++)
+			pat[i].readRecord(inp);
+	}
+	inp.close();
+
+	inp.open("doctor.txt");
+	if (!inp)
+	{
+		fileCount++;
+		cout << "Creating doctor.txt..." << endl;
+	}
+	else
+	{
+		for (int i = 0; inp.good(); i++)
+		{
+			doc[i].readRecord(inp);
+		}
+	}
+	inp.close();
+	inp.open("ward.txt");
+	if (!inp)
+	{
+		fileCount++;
+		cout << "Creating ward.txt..." << endl;
+	}
+	else
+	{
+		string docName;
+		string patName;
+		for (int i = 0; i < 8; i++)
+		{
+			getline(inp, docName, ',');
+			getline(inp, patName);
+			if (docName.empty())
+			{
+				break;
+			}
+			for (int j = 0; j < Doctor::doc_NUM; j++)
+			{
+				if (doc[j].getName() == docName)
+				{
+					ward[i].setDoctor(&doc[j]);
+				}
+			}
+			for (int j = 0; j < Patient::pat_NUM; j++)
+			{
+				if (pat[j].getName() == patName)
+				{
+					ward[i].setPatient(&pat[j]);
+				}
+			}
+		}
+	}
+	inp.close();
+	if (fileCount != 3 && fileCount != 0)
+	{
+		error = true;
+	}
+	return error;
+}
+string allignMid(string s, int width, int mod)
+{
+	int length = s.length();
+	string result = "";
+	if (mod == 1)
+	{
+		if (length > width)
+		{
+			for (int i = 0; i < width - 2; i++)
+			{
+				result += s[i];
+			}
+			result += "..";
+			return result;
+		}
+		else
+		{
+			int pad = width - length;
+			string padding(pad , ' ');
+			for (int i = 0; i < (width - length); i++)
+			{
+				result += s;
+				result += padding;
+				return result;
+			}
+		}
+	}
+	if (length < width)
+	{
+		int pad = width - length;
+		string spaces(pad / 2, ' ');
+		result = spaces + s;
+		while (result.length() < (unsigned int)width)
+			result += " ";
+		return result;
+	}
+	else if (length > width)
+	{
+		for (int i = 0; i < width - 2; i++)
+		{
+			result += s[i];
+		}
+		result += "..";
+		return result;
+	}
+	else 
+	{
+		return s;
+	}
+}
+string repeat(string a, int max)
+{
+	string s = "";
+	for (int i = 0; i < max; i++)
+		s += a;
+	return s;
 }

@@ -183,7 +183,6 @@ void Patient::readRecord(ifstream & inp)
 }
 void Patient::writeRecord(ofstream & out, int i) const
 {
-	cout << "yay" << name << gender << contact.getPhoneNum();
 	out << name << "," << gender << "," << contact.getPhoneNum() << ","
 		<< contact.getEmail() << "," << ic << ","
 		<< condition << "," << height << " " << weight << " " << isAssigned << " " << isAdmit;
@@ -302,3 +301,134 @@ void Doctor::display(int x) const
 	printLine(2);
 	cout << endl;
 }
+string Ward::getDoctorName() const
+{
+	if (doctor == NULL)
+		return "-";
+	else
+		return doctor->getName();
+}
+void Ward::releasePat() 
+{
+	isOccupied = false;
+	patient->setIsAssigned(false);
+	patient = NULL;
+}
+
+void Ward::releaseDoc()
+{
+	isStationed = false;
+	doctor->setIsAssigned(false);
+	doctor = NULL;
+}
+
+Ward::Ward()
+{
+	patient = NULL;
+	doctor = NULL;
+	isOccupied = false;
+	isStationed = false;
+	rate = 0;
+}
+void Ward::setPatient(Patient *p)
+{
+	patient = p;
+	patient->setIsAssigned(true);
+	isOccupied = true;
+}
+
+void Ward::setIsOccupied(bool a)
+{
+	isOccupied = a;
+}
+
+void Ward::setIsStationed(bool i)
+{
+	isStationed = i;
+}
+
+void Ward::setDoctor(Doctor *d)
+{
+	doctor = d;
+	isStationed = true;
+}
+
+void Ward::setRate(double r)
+{
+	rate = r;
+}
+
+void Ward::doctorPtrAdjust()
+{
+	doctor--;
+}
+
+bool Ward::getIsStationed() const
+{
+	return isStationed;
+}
+
+Doctor * Ward::getDoctor()
+{
+	return doctor;
+}
+
+Patient * Ward::getPatient() const
+{
+	return patient;
+}
+string Ward::getPatientName() const
+{
+	if (patient != NULL)
+	{
+		return patient->getName();
+	}
+	else
+		return "-";
+}
+string Ward::getDoctorNameInBracket() const
+{
+	string s = "(";
+	if (doctor != NULL)
+	{
+		s += doctor->getName();
+		s += ")";
+		return s;
+	}
+	else
+		return "";
+}
+
+bool Ward::getIsOccupied() const
+{
+	return isOccupied;
+}
+
+string Ward::getAvail() const
+{
+	string s = "";
+	if (patient == NULL && doctor != NULL)
+	{
+		s += "Available ";
+		s += getDoctorNameInBracket();
+		s += "";
+		return s;
+	}
+	else if (doctor == NULL)
+		return "No doctor";
+	else
+	{
+		s += getPatientName();
+		s += " ";
+		s += getDoctorNameInBracket();
+		s += "";
+		return s;
+	}
+}
+
+double Ward::getRate() const
+{
+	return rate;
+}
+
+
