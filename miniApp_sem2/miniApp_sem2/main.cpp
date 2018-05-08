@@ -13,18 +13,15 @@ void printLine(int);
 int promptInput(string, int, int);
 void pressEnter(bool);
 void displayMenu();
-void assignPatToDoc(Doctor  *, Patient  *, int);
+void printAllDocInfo(Doctor  *);
 int checkNum(int, int);
 
-void unbindPatient(Doctor *, int, int, int);
 void doctorMenu();
-void findPatientInDoc(Doctor *, Patient *, int, int &, int &);
 void docList(Doctor *);
 void patList(Patient *);
+void patMenu();
 void patMenu(int);
-//void deleteDoc(Doctor *, Ward *);
-void saveDoc(fstream &, Doctor*);
-void savePat(fstream &, Patient *);
+void savePerson(ofstream &, Person *, string, int);
 
 class Ward
 {
@@ -247,24 +244,14 @@ string allignMid(string s, int width, int mod)
 }
 void printWardAvail(Ward *);
 void printWard(Ward *, Doctor *, Patient *);
-const int MAX = 1000;
-
-int main()
+bool readAllData(ifstream &inp, Doctor *doc, Patient *pat, Ward *ward)
 {
-	string username = "weiwen";
-	cout << fixed << setprecision(2);
-	Doctor doc[20];
-	Patient pat[MAX];
-	Patient *admit[MAX];
-	Ward ward[9];
-
-	// input doctor and patient data
-	ifstream inp;
-	fstream out;
-
+	int fileCount = 0;
+	bool error = false;
 	inp.open("patient.txt");
 	if (!inp)
 	{
+		fileCount++;
 		cout << "Creating patient.txt..." << endl;
 	}
 	else
@@ -277,8 +264,8 @@ int main()
 	inp.open("doctor.txt");
 	if (!inp)
 	{
-		cout << "Creating doctor.txt..." << endl
-			<< endl;
+		fileCount++;
+		cout << "Creating doctor.txt..." << endl;
 	}
 	else
 	{
@@ -290,7 +277,10 @@ int main()
 	inp.close();
 	inp.open("ward.txt");
 	if (!inp)
+	{
+		fileCount++;
 		cout << "Creating ward.txt..." << endl;
+	}
 	else
 	{
 		string docName;
@@ -299,6 +289,10 @@ int main()
 		{
 			getline(inp, docName, ',');
 			getline(inp, patName);
+			if (docName.empty())
+			{
+				break;
+			}
 			for (int j = 0; j < Doctor::doc_NUM; j++)
 			{
 				if (doc[j].getName() == docName)
@@ -316,6 +310,48 @@ int main()
 		}
 	}
 	inp.close();
+	if (fileCount != 3 && fileCount != 0)
+	{
+		error = true;
+	}
+	return error;
+}
+const int MAX = 1000;
+
+int main()
+{
+	string username = "weiwen";
+	cout << fixed << setprecision(2);
+	Doctor doc[20];
+	Patient pat[MAX];
+	Patient *admit[MAX];
+	Ward ward[9];
+
+	// input doctor and patient data
+	ifstream inp;
+	ofstream out;
+	bool error = readAllData(inp, doc, pat, ward);
+	if (error)
+	{
+		cout << "Program initialization error." << endl
+			<< "Press 'Y' to delete previous data, 'n' to exit program. :";
+		char del;
+		cin >> del;
+		if (del == 'Y')
+		{
+			out.open("doctor.txt");
+			out.close();
+			out.open("patient.txt");
+			out.close();
+			out.open("ward.txt");
+			out.close();
+			cout << "Previous data deleted. Please restart the program now." << endl;
+			exit(1);
+		}
+		else
+			exit(1);
+	}
+	
 
 	int choice = 0;
 	while (choice == 0)
@@ -331,18 +367,7 @@ int main()
 
 			if (choice == 1)  // Expand information
 			{
-				printLine(2);
-				cout << "Doctors' basic information / contact information." << endl << endl;
-				if (Doctor::doc_NUM == 0)
-					cout << "No doctors record" << endl;
-				else
-				{
-					for (int i = 0; i < Doctor::doc_NUM; i++)
-					{
-						doc[i].display(i);
-					}
-				}
-				pressEnter(1);
+				printAllDocInfo(doc);
 			}
 			else if (choice == 2) // Add doctor
 			{
@@ -359,21 +384,6 @@ int main()
 				else
 				{
 					doc[Doctor::doc_NUM].addDoc();
-					/*if (doc[Doctor::doc_NUM].getIsAssigned() == false)
-					{
-						cout << "Doctor " << doc[Doctor::doc_NUM].getName() << " is not stationed to any room." << endl << endl;
-					}
-					else
-					{
-						cout << "Doctor " << doc[Doctor::doc_NUM].getName() << "is stationed in room ";
-						for (int i = 0; i < 8; i++)
-						{
-							if (ward[i].getDoctor() == &doc[Doctor::doc_NUM])
-							{
-								cout << 'A' + i << endl << endl;
-							}
-						}
-					}*/
 					printWardAvail(ward);
 
 					cout << "Assign " << doc[Doctor::doc_NUM].getName() << " to room (A - H) => ";
@@ -475,18 +485,18 @@ int main()
 			}
 			else if (choice == 4) // go back
 			{
-				saveDoc(out, doc);
+				savePerson(out, doc, "doctor.txt", Doctor::doc_NUM);
 				choice = 0;
 				break;
 			}
-			saveDoc(out, doc);
+			savePerson(out, doc, "doctor.txt", Doctor::doc_NUM);
 			choice = 1;
 		}
 		while (choice == 2)
 		{
 			patList(pat);
 
-			patMenu(1);
+			patMenu();
 			int admitCount = 0;
 			for (int i = 0; i < MAX; i++)
 				admit[i] = NULL;
@@ -519,7 +529,7 @@ int main()
 					else
 						cout << "\tNot assigned to any room." << endl << endl;
 
-					patMenu(2);
+					patMenu(1);
 
 					choice = promptInput(username, 1, 4);
 					if (choice == 1)  // set / change room
@@ -579,11 +589,11 @@ int main()
 			}
 			else if (choice == 3)  // return
 			{
-				savePat(out, pat);
+				savePerson(out, pat, "patient.txt", Patient::pat_NUM);
 				choice = 0;
 				break;
 			}
-			savePat(out, pat);
+			savePerson(out, pat, "patient.txt", Patient::pat_NUM);
 			choice = 2;
 		}
 		if (choice == 3)
@@ -592,13 +602,29 @@ int main()
 			break;
 		}
 	}
-	saveDoc(out, doc);
-	savePat(out, pat);
+	savePerson(out, doc, "doctor.txt", Doctor::doc_NUM);
+	savePerson(out, pat, "patient.txt", Patient::pat_NUM);
 	out.open("ward.txt", ios::out);
 	for (int i = 0; i < 8; i++)
 		out << ward[i].getDoctorName() << "," << ward[i].getPatientName() << endl;
 	out.close();
 	return 0;
+}
+
+void printAllDocInfo(Doctor  *doc)
+{
+	printLine(2);
+	cout << "Doctors' basic information / contact information." << endl << endl;
+	if (Doctor::doc_NUM == 0)
+		cout << "No doctors record" << endl;
+	else
+	{
+		for (int i = 0; i < Doctor::doc_NUM; i++)
+		{
+			doc[i].display(i);
+		}
+	}
+	pressEnter(1);
 }
 
 
@@ -621,23 +647,20 @@ void doctorMenu()
 		<< "  4. Go back" << endl
 		<< endl;
 }
+void patMenu()
+{
+	cout << "  Please select an option" << endl
+		<< "  1. Select patient" << endl
+		<< "  2. Add patient" << endl
+		<< "  3. Go back" << endl
+		<< endl;
+}
 void patMenu(int select)
 {
-	if (select == 1)
-	{
-		cout << "  Please select an option" << endl
-			<< "  1. Select patient" << endl
-			<< "  2. Add patient" << endl
-			<< "  3. Go back" << endl
-			<< endl;
-	}
-	else if (select == 2)
-	{
-		cout << "  Please select an option" << endl
-			<< "  1. Set / change room" << endl
-			<< "  2. Discharge patient" << endl
-			<< "  3. Go back" << endl << endl;
-	}
+	cout << "  Please select an option" << endl
+		<< "  1. Set / change room" << endl
+		<< "  2. Discharge patient" << endl
+		<< "  3. Go back" << endl << endl;
 }
 
 void docList(Doctor * p)
@@ -667,22 +690,13 @@ void patList(Patient * p)
 	}
 	cout << endl;
 }
-void savePat(fstream &out, Patient * pat)
+void savePerson(ofstream &out, Person * p, string s, int max)
 {
-	out.open("patient.txt", ios::out);
-	for (int i = 0; i < Patient::pat_NUM; i++) // to save patient list
-		pat[i].writeRecord(out, i);
+	out.open(s.data());
+	for (int i = 0; i < max; i++) // to save person list
+		p[i].writeRecord(out, i);
 	out.close();
 }
-
-void saveDoc(fstream &out, Doctor * doc)
-{
-	out.open("doctor.txt", ios::out);
-	for (int i = 0; i < Doctor::doc_NUM; i++) // to save doctor list
-		doc[i].writeRecord(out, i);
-	out.close();
-}
-
 
 void printLine(int x)
 {
@@ -712,30 +726,6 @@ int promptInput(string username, int min, int max)
 	cout << endl;
 	return tmp;
 }
-
-
-//void deleteDoc(Doctor *d, Ward *ward, int wIndex)
-//{
-//	cout << "Remove doctor number: ";
-//	int docNo = checkNum(0, Doctor::doc_NUM);
-//	docNo--;
-//	cout << "Confirm to remove '" << d[docNo].getName() << "' from system? (Y / n): ";
-//	string yesno;
-//	cin >> yesno;
-//	if (yesno == "Y")
-//	{
-//		for (int i = docNo; i < Doctor::doc_NUM; i++)
-//		{
-//			d[i] = d[i + 1];
-//		}
-//		Doctor::doc_NUM--;
-//		cout << "Record removed." << endl;
-//	}
-//	else
-//		cout << "Record not removed." << endl;
-//	cout << endl;
-//	pressEnter(1);
-//}
 
 void pressEnter(bool skip)
 {

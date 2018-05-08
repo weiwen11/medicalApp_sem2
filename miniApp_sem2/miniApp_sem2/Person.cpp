@@ -61,9 +61,6 @@ void Person::printPerson() const
 		<< setw(4) << "" << setw(15) << "IC"
 		<< ": " << setw(30) << ic << endl;
 }
-void Person::readRecord(ifstream & inp)
-{
-}
 void Person::readBasic()
 {
 	cout << "Basic information" << endl;
@@ -176,8 +173,9 @@ void Patient::readRecord(ifstream & inp)
 		pat_NUM++;
 	}
 }
-void Patient::writeRecord(fstream & out, int i) const
+void Patient::writeRecord(ofstream & out, int i) const
 {
+	cout << "yay" << name << gender << contact.getPhoneNum();
 	out << name << "," << gender << "," << contact.getPhoneNum() << ","
 		<< contact.getEmail() << "," << ic << ","
 		<< condition << "," << height << " " << weight << " " << isAssigned << " " << isAdmit;
@@ -200,10 +198,6 @@ void Patient::display() const
 		<< setw(4) << "" << setw(15) << "Condition "
 		<< ": " << condition << endl << endl;
 }
-bool Person::getIsAssigned() const
-{
-	return isAssigned;
-}
 double Patient::getWeight() const
 {
 	return weight;
@@ -211,10 +205,6 @@ double Patient::getWeight() const
 double Patient::getHeight() const
 {
 	return height;
-}
-void Person::setIsAssigned(bool a)
-{
-	isAssigned = a;
 }
 
 bool Patient::getIsAdmit() const
@@ -283,7 +273,7 @@ void Doctor::readRecord(ifstream &inp)
 		doc_NUM++;
 	}
 }
-void Doctor::writeRecord(fstream &out, int i) const
+void Doctor::writeRecord(ofstream &out, int i) const
 {
 	out << name << "," << gender << "," << ic << "," << position << ","
 		<< contact.getPhoneNum() << "," << contact.getEmail() << ","

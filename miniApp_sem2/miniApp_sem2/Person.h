@@ -32,7 +32,8 @@ public:
 	bool getIsAssigned() const;
 	void setIsAssigned(bool);
 	void printPerson() const;
-	virtual void readRecord(ifstream &);
+	virtual void readRecord(ifstream &) {};
+	virtual void writeRecord(ofstream &, int) const{};
 	void readBasic();
 	void readContact();
 };
@@ -64,7 +65,7 @@ public:
 	bool getIsAdmit() const;
 	void setIsAdmit(bool);
 	void readRecord(ifstream &);
-	void writeRecord(fstream &, int) const;
+	void writeRecord(ofstream &, int) const;
 	void display() const;
 };
 class Doctor : public Employee
@@ -75,7 +76,7 @@ public:
 	static int doc_NUM;
 	void addDoc();
 	void readRecord(ifstream &);
-	void writeRecord(fstream &, int) const;
+	void writeRecord(ofstream &, int) const;
 	void display(int) const;
 	friend void deleteDoc(Doctor *);
 	friend void unbindPatient(Doctor *, int, int, int);
