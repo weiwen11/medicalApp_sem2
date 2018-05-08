@@ -186,6 +186,8 @@ double Ward::getRate() const
 {
 	return rate;
 }
+
+void assignPatient(Patient *, int, Ward *);
 string repeat(string a, int max)
 {
 	string s = "";
@@ -532,54 +534,8 @@ int main()
 							cout << (char)('A' + wIndex) << endl << endl;
 							ward[wIndex].releasePat();
 						}
-						printWardAvail(ward);
-						cout << "Assign " << admit[patNo]->getName() << " to room (A - H)" << endl
-							<< "Enter 'Z' to add to waiting list " << " => ";
-						char chr;
-						int wardNo;
-						cin >> chr;
-						chr = toupper(chr);
-						while (cin)
-						{
-							if (chr != 'A' && chr != 'B' && chr != 'C' && chr != 'D' &&
-								chr != 'E' && chr != 'F' && chr != 'G' && chr != 'H' && chr != 'Z')
-							{
-								cout << "Please enter correct room => ";
-								cin >> chr;
-								chr = toupper(chr);
-							}
-							if (chr == 'Z')
-							{
-								admit[patNo]->setIsAssigned(false);
-								cout << admit[patNo]->getName() << " added to waiting list." << endl;
-								break;
-							}
-							else
-							{
-								wardNo = chr - 'A';
-								if (ward[wardNo].getIsStationed() == 0)
-								{
-									cout << "No doctors in room " << chr << endl;
-									cout << "Please enter another room =>";
-									cin >> chr;
-									chr = toupper(chr);
-								}
-								else if (ward[wardNo].getIsOccupied() == 0)
-								{
-									ward[wardNo].setPatient(admit[patNo]);
-									cout << admit[patNo]->getName() << " assinged to room " << chr << endl;
-									cout << "gg" << wardNo << ward[wardNo].getPatient()->getName();
-									break;
-								}
-								else
-								{
-									cout << "Room " << chr << " is occupied by " << ward[wardNo].getPatient()->getName() << endl;
-									cout << "Please enter another room => ";
-									cin >> chr;
-									chr = toupper(chr);
-								}
-							}
-						}
+						assignPatient(admit[patNo], admitCount, ward);
+						
 						pressEnter(1);
 
 					}
@@ -615,55 +571,9 @@ int main()
 			{
 				pat[Patient::pat_NUM].addPat();
 				pat[Patient::pat_NUM].setIsAdmit(true);
-				char chr;
-				int wardNo;
 				cout << endl;
-				printWardAvail(ward);
-				cout << "Assign " << pat[Patient::pat_NUM].getName() << " to room (A - H)" << endl
-					<< "Enter 'Z' to assign later " << " => ";
-				cin >> chr;
-				chr = toupper(chr);
-				while (cin)
-				{
-					if (chr != 'A' && chr != 'B' && chr != 'C' && chr != 'D' &&
-						chr != 'E' && chr != 'F' && chr != 'G' && chr != 'H' && chr != 'Z')
-					{
-						cout << "Please enter correct room => ";
-						cin >> chr;
-						chr = toupper(chr);
-					}
-					 if (chr == 'Z')
-					{
-						 pat[Patient::pat_NUM].setIsAssigned(false);
-						 cout << pat[Patient::pat_NUM].getName() << " added to waiting list." << endl;
-						 break;
-					}
-					else
-					{
-						wardNo = chr - 'A';
-						if (ward[wardNo].getIsStationed() == 0)
-						{
-							cout << "No doctors in room " << chr << endl;
-							cout << "Please enter another room => ";
-							cin >> chr;
-							chr = toupper(chr);
-						}
-						else if (ward[wardNo].getIsOccupied() == 0)
-						{
-							ward[wardNo].setPatient(&pat[Patient::pat_NUM]);
-							cout << pat[Patient::pat_NUM].getName() << " assinged to room " << chr << endl;
-							cout << "gg" << wardNo << ward[wardNo].getPatient()->getName();
-							break;
-						}
-						else
-						{
-							cout << "Room " << chr << " is occupied by " << ward[wardNo].getPatient()->getName() << endl;
-							cout << "Please enter another room => ";
-							cin >> chr;
-							chr = toupper(chr);
-						}
-					}
-				}
+				assignPatient(&pat[Patient::pat_NUM], Patient::pat_NUM, ward);
+				
 				Patient::pat_NUM++;
 				pressEnter(1);
 			}
@@ -950,4 +860,56 @@ int waitingList(Patient *pat, string *s)
 
 	}
 	return count;
+}
+void assignPatient(Patient *pat, int max, Ward *ward)
+{
+	char chr;
+	int wardNo;
+	printWardAvail(ward);
+
+	cout << "Assign " << pat->getName() << " to room (A - H)" << endl
+		<< "Enter 'Z' to assign later " << " => ";
+	cin >> chr;
+	chr = toupper(chr);
+	while (cin)
+	{
+		if (chr != 'A' && chr != 'B' && chr != 'C' && chr != 'D' &&
+			chr != 'E' && chr != 'F' && chr != 'G' && chr != 'H' && chr != 'Z')
+		{
+			cout << "Please enter correct room => ";
+			cin >> chr;
+			chr = toupper(chr);
+		}
+		if (chr == 'Z')
+		{
+			pat->setIsAssigned(false);
+			cout << pat->getName() << " added to waiting list." << endl;
+			break;
+		}
+		else
+		{
+			wardNo = chr - 'A';
+			if (ward[wardNo].getIsStationed() == 0)
+			{
+				cout << "No doctors in room " << chr << endl;
+				cout << "Please enter another room => ";
+				cin >> chr;
+				chr = toupper(chr);
+			}
+			else if (ward[wardNo].getIsOccupied() == 0)
+			{
+				ward[wardNo].setPatient(pat);
+				cout << pat->getName() << " assinged to room " << chr << endl;
+				cout << "gg" << wardNo << ward[wardNo].getPatient()->getName();
+				break;
+			}
+			else
+			{
+				cout << "Room " << chr << " is occupied by " << ward[wardNo].getPatient()->getName() << endl;
+				cout << "Please enter another room => ";
+				cin >> chr;
+				chr = toupper(chr);
+			}
+		}
+	}
 }
