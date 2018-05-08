@@ -407,7 +407,6 @@ int main()
 							{
 								ward[wardNo].setDoctor(&doc[Doctor::doc_NUM]);
 								cout << doc[Doctor::doc_NUM].getName() << " stationed to room " << chr << endl;
-								cout << "gg" << wardNo << ward[wardNo].getDoctorName();
 								break;
 							}
 							else
