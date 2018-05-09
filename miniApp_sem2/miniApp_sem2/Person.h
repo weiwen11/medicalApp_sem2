@@ -92,7 +92,6 @@ public:
 
 	Ward();
 
-	string getPatientIC() const;
 	void setPatient(Patient *);
 	void setIsOccupied(bool);
 	void setIsStationed(bool);

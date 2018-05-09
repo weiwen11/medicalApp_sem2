@@ -256,7 +256,6 @@ int main()
 				{
 					cout << "Enter patient's IC (without '-') => ";
 					string tmpIC;
-					char chr;
 					cin >> tmpIC;
 					for (int i = 0; i < Patient::pat_NUM; i++)
 					{
@@ -264,6 +263,7 @@ int main()
 						{
 							cout << "Match found. Confirm to add " << pat[i].getName() << " ? (Y / n) => ";
 							string yesno;
+							cin >> yesno;
 							if (yesno == "Y")
 							{
 								cout << "Patient added." << endl;
@@ -719,7 +719,7 @@ bool readAllData(ifstream &inp, Doctor *doc, Patient *pat, Ward *ward)
 		{
 			getline(inp, docIC, ',');
 			getline(inp, patIC);
-			if (docName.empty())
+			if (docIC.empty())
 			{
 				break;
 			}
