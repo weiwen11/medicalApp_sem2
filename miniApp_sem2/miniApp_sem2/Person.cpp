@@ -38,7 +38,7 @@ string Person::getName() const
 {
 	return name;
 }
-string Person::getIc() const
+string Person::getIC() const
 {
 	return ic;
 }
@@ -301,12 +301,34 @@ void Doctor::display(int x) const
 	printLine(2);
 	cout << endl;
 }
+string Ward::getDoctorIC() const
+{
+	if (doctor == NULL)
+	{
+		return "-";
+	}
+	else
+	{
+		return doctor->getIC();
+	}
+}
 string Ward::getDoctorName() const
 {
 	if (doctor == NULL)
 		return "-";
 	else
 		return doctor->getName();
+}
+string Ward::getPatientIC() const
+{
+	if (patient == NULL)
+	{
+		return "-";
+	}
+	else
+	{
+		return patient->getIC();
+	}
 }
 void Ward::releasePat() 
 {

@@ -25,7 +25,7 @@ protected:
 public:
 	Person();
 	string getName() const;
-	string getIc() const;
+	string getIC() const;
 	string getGender() const;
 	string getContactNum() const;
 	string getContactEmail() const;
@@ -91,6 +91,8 @@ class Ward
 public:
 
 	Ward();
+
+	string getPatientIC() const;
 	void setPatient(Patient *);
 	void setIsOccupied(bool);
 	void setIsStationed(bool);
@@ -102,7 +104,9 @@ public:
 	Doctor *getDoctor();
 	Patient *getPatient() const;
 	string getPatientName() const;
+	string getDoctorIC() const;
 	string getDoctorName() const;
+	string getPatientIC() const;
 	string getDoctorNameInBracket() const;
 	bool getIsOccupied() const;
 	string getAvail() const;

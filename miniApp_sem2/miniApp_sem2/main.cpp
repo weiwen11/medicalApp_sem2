@@ -240,12 +240,23 @@ int main()
 			}
 			else if (choice == 2)  // add patient
 			{
-				pat[Patient::pat_NUM].addPat();
-				pat[Patient::pat_NUM].setIsAdmit(true);
-				cout << endl;
-				assignPatient(&pat[Patient::pat_NUM], ward);
-				
-				Patient::pat_NUM++;
+				cout << "1. Add new patient information" << endl
+					<< "2. Search from records" << endl
+					<< "3. Go back." << endl;
+				choice = promptInput(username, 1, 3);
+				if (choice == 1)
+				{
+					pat[Patient::pat_NUM].addPat();
+					pat[Patient::pat_NUM].setIsAdmit(true);
+					cout << endl;
+					assignPatient(&pat[Patient::pat_NUM], ward);
+					Patient::pat_NUM++;
+				}
+				else
+				{
+					cout << "Enter patient's name => "
+				}
+
 				pressEnter(1);
 			}
 			else if (choice == 3)  // return
@@ -267,7 +278,7 @@ int main()
 	savePatient(out, pat);
 	out.open("ward.txt", ios::out);
 	for (int i = 0; i < 8; i++)
-		out << ward[i].getDoctorName() << "," << ward[i].getPatientName() << endl;
+		out << ward[i].getDoctorIC() << "," << ward[i].getPatientIC() << endl;
 	out.close();
 	return 0;
 }
@@ -676,26 +687,26 @@ bool readAllData(ifstream &inp, Doctor *doc, Patient *pat, Ward *ward)
 	}
 	else
 	{
-		string docName;
-		string patName;
+		string docIC;
+		string patIC;
 		for (int i = 0; i < 8; i++)
 		{
-			getline(inp, docName, ',');
-			getline(inp, patName);
+			getline(inp, docIC, ',');
+			getline(inp, patIC);
 			if (docName.empty())
 			{
 				break;
 			}
 			for (int j = 0; j < Doctor::doc_NUM; j++)
 			{
-				if (doc[j].getName() == docName)
+				if (doc[j].getIC() == docIC)
 				{
 					ward[i].setDoctor(&doc[j]);
 				}
 			}
 			for (int j = 0; j < Patient::pat_NUM; j++)
 			{
-				if (pat[j].getName() == patName)
+				if (pat[j].getIC() == patIC)
 				{
 					ward[i].setPatient(&pat[j]);
 				}
