@@ -254,7 +254,33 @@ int main()
 				}
 				else
 				{
-					cout << "Enter patient's name => "
+					cout << "Enter patient's IC (without '-') => ";
+					string tmpIC;
+					char chr;
+					cin >> tmpIC;
+					for (int i = 0; i < Patient::pat_NUM; i++)
+					{
+						if (pat[i].getIC() == tmpIC)
+						{
+							cout << "Match found. Confirm to add " << pat[i].getName() << " ? (Y / n) => ";
+							string yesno;
+							if (yesno == "Y")
+							{
+								cout << "Patient added." << endl;
+								pat[i].setIsAdmit(true);
+								cout << endl;
+								assignPatient(&pat[i], ward);
+								break;
+							}
+							else
+							{
+								cout << "Patient not added." << endl;
+								break;
+							}
+
+						}
+
+					}
 				}
 
 				pressEnter(1);
