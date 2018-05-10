@@ -78,8 +78,6 @@ public:
 	void readRecord(ifstream &);
 	void writeRecord(ofstream &, int) const;
 	void display(int) const;
-	friend void deleteDoc(Doctor *);
-	friend void unbindPatient(Doctor *, int, int, int);
 };
 class Ward
 {
@@ -89,9 +87,7 @@ class Ward
 	Doctor *doctor;
 	Patient *patient;
 public:
-
 	Ward();
-
 	void setPatient(Patient *);
 	void setIsOccupied(bool);
 	void setIsStationed(bool);

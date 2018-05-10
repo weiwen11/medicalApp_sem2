@@ -261,23 +261,29 @@ int main()
 					{
 						if (pat[i].getIC() == tmpIC)
 						{
-							cout << "Match found. Confirm to add " << pat[i].getName() << " ? (Y / n) => ";
-							string yesno;
-							cin >> yesno;
-							if (yesno == "Y")
+							if (pat[i].getIsAssigned() || pat[i].getIsAdmit())
 							{
-								cout << "Patient added." << endl;
-								pat[i].setIsAdmit(true);
-								cout << endl;
-								assignPatient(&pat[i], ward);
-								break;
+								cout << "Patient " << pat[i].getName() << " already admitted." << endl;
 							}
 							else
 							{
-								cout << "Patient not added." << endl;
-								break;
+								cout << "Match found. Confirm to add " << pat[i].getName() << " ? (Y / n) => ";
+								string yesno;
+								cin >> yesno;
+								if (yesno == "Y")
+								{
+									cout << "Patient added." << endl;
+									pat[i].setIsAdmit(true);
+									cout << endl;
+									assignPatient(&pat[i], ward);
+									break;
+								}
+								else
+								{
+									cout << "Patient not added." << endl;
+									break;
+								}
 							}
-
 						}
 
 					}
