@@ -136,7 +136,7 @@ int main()
 		}
 		printWard(ward, doc, pat, currentTix);
 		displayMenu();
-		choice = promptInput(username, 1, 4);
+		choice = promptInput(username, 1, 5);
 		while (choice == 1)
 		{
 			docList(doc);
@@ -296,9 +296,11 @@ int main()
 			}
 			else if (choice == 2)  // add patient
 			{
-				cout << "1. Add new patient information" << endl
-					<< "2. Search from records" << endl
-					<< "3. Go back." << endl;
+				cout << endl << "  Please select an option" << endl;
+				cout << "  1. Add new patient information" << endl
+					<< "  2. Search from records" << endl
+					<< "  3. Go back." << endl;
+				cout << endl;
 				choice = promptInput(username, 1, 3);
 				if (choice == 1)
 				{
@@ -369,6 +371,20 @@ int main()
 
 		}
 		if (choice == 4)
+		{
+			if (admitCount != 0)
+			{
+				cout << "Please discharge all patients before resetting." << endl;
+				pressEnter(1);
+			}
+			else
+			{
+				currentTix = 0;
+				TicketMaster::initTicketNum(0);
+			}
+			choice = 0;
+		}
+		if (choice == 5)
 		{
 			cout << "Thank you for using this program" << endl;
 			break;
@@ -477,7 +493,8 @@ void displayMenu()
 		<< "  1. Doctor" << endl
 		<< "  2. Patient" << endl
 		<< "  3. Add ticket number" << endl
-		<< "  4. Exit" << endl
+		<< "  4. Reset ticket number" << endl
+		<< "  5. Exit" << endl
 		<< endl;
 }
 void doctorMenu()
