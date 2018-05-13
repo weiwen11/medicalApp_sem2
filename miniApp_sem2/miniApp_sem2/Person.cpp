@@ -165,6 +165,7 @@ string Patient::getCondition() const
 void Patient::readRecord(ifstream & inp)
 {
 	string test;
+	int tmp;
 	getline(inp, test, ',');
 	if (!test.empty())
 	{
@@ -176,16 +177,17 @@ void Patient::readRecord(ifstream & inp)
 		contact.setEmail(test);
 		getline(inp, ic, ',');
 		getline(inp, condition, ',');
-		inp >> height >> weight >> isAssigned >> isAdmit;
+		inp >> height >> weight >> isAssigned >> isAdmit >> tmp;
 		inp.ignore();
 		pat_NUM++;
 	}
+	ticket.setTicket(tmp);
 }
 void Patient::writeRecord(ofstream & out, int i) const
 {
 	out << name << "," << gender << "," << contact.getPhoneNum() << ","
 		<< contact.getEmail() << "," << ic << ","
-		<< condition << "," << height << " " << weight << " " << isAssigned << " " << isAdmit;
+		<< condition << "," << height << " " << weight << " " << isAssigned << " " << isAdmit << " " << ticket.getTicket();
 	if (i != pat_NUM - 1)
 		out << endl;
 }
@@ -222,6 +224,14 @@ bool Patient::getIsAdmit() const
 void Patient::setIsAdmit(bool a)
 {
 	isAdmit = a;
+	if (isAdmit)
+		ticket.giveTicket();
+	else
+		ticket.reset();
+}
+int Patient::getTicket()const
+{
+	return ticket.getTicket();
 }
 
 Doctor::Doctor()

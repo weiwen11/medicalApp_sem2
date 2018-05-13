@@ -47,11 +47,47 @@ public:
 	double findSalary() const;
 	string getPosName() const;
 };
+class TicketMaster
+{
+	int ticket;
+	static int tix_NUM;
+public:
+	TicketMaster()
+	{
+		ticket = 0;
+	}
+	static int getTix_NUM()
+	{
+		return tix_NUM;
+	}
+	int getTicket()const
+	{
+		return ticket;
+	}
+	void giveTicket()
+	{
+		ticket = tix_NUM;
+		tix_NUM++;
+	}
+	void setTicket(int t)
+	{
+		ticket = t;
+	}
+	void reset()
+	{
+		ticket = 0;
+	}
+	static void initTicketNum(int a)
+	{
+		tix_NUM = a+1;
+	}
+};
 class Patient : public Person
 {
 	string condition;
 	double height, weight;
 	bool isAdmit;
+	TicketMaster ticket;
 public:
 	Patient();
 	static int pat_NUM;
@@ -61,6 +97,7 @@ public:
 	double getBMI() const;
 	string getBMIStatus(double) const;
 	string getCondition() const;
+	int getTicket() const;
 	
 	bool getIsAdmit() const;
 	void setIsAdmit(bool);

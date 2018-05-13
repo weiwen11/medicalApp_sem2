@@ -13,7 +13,7 @@ void printLine(int);
 void pressEnter(bool);
 void displayMenu();
 
-bool readAllData(ifstream &, Doctor *, Patient *, Ward *);
+bool readAllData(ifstream &, Doctor *, Patient *, Ward *, int &);
 int checkNum(int, int);
 int promptInput(string, int, int);
 int waitingList(Patient *, string *);
@@ -39,6 +39,8 @@ void assignPatient(Patient *, Ward *);
 void printWardAvail(Ward *);
 void printWard(Ward *, Doctor *, Patient *);
 
+
+int TicketMaster::tix_NUM = 1;
 const int MAX = 1000;
 int main()
 {
@@ -51,8 +53,9 @@ int main()
 
 	ifstream inp;
 	ofstream out;
+	int currentTix = 0;
 	// input doctor and patient and ward data
-	bool error = readAllData(inp, doc, pat, ward);
+	bool error = readAllData(inp, doc, pat, ward, currentTix);
 	if (error)
 	{
 		cout << "Program initialization error." << endl
@@ -73,14 +76,63 @@ int main()
 		else
 			return 0;
 	}
+	TicketMaster::initTicketNum(currentTix);
 	
-
+	int admitCount = 0;
+	int waitingCount = 0;
+	int availableWard = 0;
 	int choice = 0;
 	while (choice == 0)
 	{
+		cout << currentTix << pat[1].getTicket() << endl;
+		waitingCount = 0;
+		availableWard = 0;
+		admitCount = 0;
+		for (int i = 0; i < MAX; i++)
+			admit[i] = NULL;
+		for (int i = 0; i < Patient::pat_NUM; i++)
+		{
+			if (pat[i].getIsAdmit())
+			{
+				admit[admitCount] = &pat[i];
+				admitCount++;
+			}
+			if (pat[i].getIsAdmit() && !pat[i].getIsAssigned())
+				waitingCount++;
+		}
+		for (int i = 0; i < 8; i++)
+		{
+			if (!ward[i].getIsOccupied() && ward[i].getIsStationed())
+			{
+				availableWard++;
+			}
+		}
+		if (admitCount > 0)
+		{
+			for (int i = 0; i < admitCount; i++)
+			{
+				if (!admit[i]->getIsAssigned())
+				{
+					if (admit[i]->getTicket() == currentTix)
+					{
+						for (int j = 0; j < 8; j++)
+						{
+							if (!ward[j].getIsOccupied() && ward[j].getIsStationed())
+							{
+								ward[j].setPatient(admit[i]);
+								waitingCount--;
+								availableWard--;
+								break;
+							}
+						}
+					}
+				}
+
+			}
+		}
 		printWard(ward, doc, pat);
 		displayMenu();
-		choice = promptInput(username, 1, 3);
+		choice = promptInput(username, 1, 4);
 		while (choice == 1)
 		{
 			docList(doc);
@@ -159,7 +211,7 @@ int main()
 			patList(pat);
 
 			patMenu();
-			int admitCount = 0;
+			admitCount = 0;
 			for (int i = 0; i < MAX; i++)
 				admit[i] = NULL;
 			for (int i = 0; i < Patient::pat_NUM; i++)
@@ -302,6 +354,18 @@ int main()
 		}
 		if (choice == 3)
 		{
+			if (waitingCount != 0 && availableWard != 0)
+				currentTix++;
+			else
+			{
+				cout << "No patients in waiting list or no rooms available." << endl;
+				pressEnter(1);
+			}
+			choice = 0;
+
+		}
+		if (choice == 4)
+		{
 			cout << "Thank you for using this program" << endl;
 			break;
 		}
@@ -311,6 +375,7 @@ int main()
 	out.open("ward.txt", ios::out);
 	for (int i = 0; i < 8; i++)
 		out << ward[i].getDoctorIC() << "," << ward[i].getPatientIC() << endl;
+	out << currentTix;
 	out.close();
 	return 0;
 }
@@ -407,7 +472,8 @@ void displayMenu()
 	cout << "  Please select an option" << endl
 		<< "  1. Doctor" << endl
 		<< "  2. Patient" << endl
-		<< "  3. Exit" << endl
+		<< "  3. Add ticket number" << endl
+		<< "  4. Exit" << endl
 		<< endl;
 }
 void doctorMenu()
@@ -574,7 +640,12 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat)
 	wCount = waitingList(pat, s);
 	for (int i = 0; i < 5; i++)
 	{
-		cout << "\t| " << i+1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 80) << "|" << endl;
+		if (i == 2)
+		{
+			cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 80) << "|" << endl;
+		}
+		else
+		cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 80) << "|" << endl;
 	}
 	if (wCount > 5)
 	{
@@ -680,7 +751,7 @@ void assignPatient(Patient *pat, Ward *ward)
 		}
 	}
 }
-bool readAllData(ifstream &inp, Doctor *doc, Patient *pat, Ward *ward)
+bool readAllData(ifstream &inp, Doctor *doc, Patient *pat, Ward *ward, int &currentTix)
 {
 	int fileCount = 0;
 	bool error = false;
@@ -744,6 +815,7 @@ bool readAllData(ifstream &inp, Doctor *doc, Patient *pat, Ward *ward)
 				}
 			}
 		}
+		inp >> currentTix;
 	}
 	inp.close();
 	if (fileCount != 3 && fileCount != 0)
