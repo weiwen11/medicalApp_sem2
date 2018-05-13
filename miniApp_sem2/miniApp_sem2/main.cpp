@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
+#include <ctime>
 #include "Person.h"
 using namespace std;
 
@@ -37,7 +38,7 @@ void assignPatient(Patient *, Ward *);
 
 // Ward's standalone function
 void printWardAvail(Ward *);
-void printWard(Ward *, Doctor *, Patient *);
+void printWard(Ward *, Doctor *, Patient *, int);
 
 
 int TicketMaster::tix_NUM = 1;
@@ -82,9 +83,14 @@ int main()
 	int waitingCount = 0;
 	int availableWard = 0;
 	int choice = 0;
+	int availWardIndex[8];
+	srand(time(NULL));
+	int random = 0;
 	while (choice == 0)
 	{
-		cout << currentTix << pat[1].getTicket() << endl;
+		for (int i = 0; i < 8; i++)
+			availWardIndex[i] = 0;
+		//cout << currentTix << pat[1].getTicket() << endl;
 		waitingCount = 0;
 		availableWard = 0;
 		admitCount = 0;
@@ -100,13 +106,18 @@ int main()
 			if (pat[i].getIsAdmit() && !pat[i].getIsAssigned())
 				waitingCount++;
 		}
+		int cc = 0;
 		for (int i = 0; i < 8; i++)
 		{
 			if (!ward[i].getIsOccupied() && ward[i].getIsStationed())
 			{
+				availWardIndex[cc] = i;
+				cc++;
 				availableWard++;
 			}
 		}
+		random = rand() % availableWard;
+		cout << random << endl;
 		if (admitCount > 0)
 		{
 			for (int i = 0; i < admitCount; i++)
@@ -115,22 +126,15 @@ int main()
 				{
 					if (admit[i]->getTicket() == currentTix)
 					{
-						for (int j = 0; j < 8; j++)
-						{
-							if (!ward[j].getIsOccupied() && ward[j].getIsStationed())
-							{
-								ward[j].setPatient(admit[i]);
-								waitingCount--;
-								availableWard--;
-								break;
-							}
-						}
+						ward[availWardIndex[random]].setPatient(admit[i]);
+						waitingCount--;
+						availableWard--;
+						break;
 					}
 				}
-
 			}
 		}
-		printWard(ward, doc, pat);
+		printWard(ward, doc, pat, currentTix);
 		displayMenu();
 		choice = promptInput(username, 1, 4);
 		while (choice == 1)
@@ -610,7 +614,7 @@ void printWardAvail(Ward *ward)
 	cout << "Room H: " << ward[7].getAvail() << endl;
 	cout << endl;
 }
-void printWard(Ward *ward, Doctor * doc, Patient * pat)
+void printWard(Ward *ward, Doctor * doc, Patient * pat, int currentTix)
 {
 	cout << "\t" << repeat("-", 100) << endl;
 	cout << "\t|" << repeat(" ", 17) << repeat(" ", 9) << "A" << repeat(" ", 18) << "B" 
@@ -638,14 +642,89 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat)
 	string s[MAX];
 	int wCount;
 	wCount = waitingList(pat, s);
-	for (int i = 0; i < 5; i++)
+	string tix[3];
+	string tixTmp[3];
+	int length;
+	int tmp;
+	for (int q = 0; q < 3; q++)
 	{
-		if (i == 2)
+		length = 0;
+		int c[4];
+		tmp = currentTix - q;
+		if (tmp < 0)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 80) << "|" << endl;
+			tix[q] = "0000";
 		}
 		else
-		cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 80) << "|" << endl;
+		{
+			for (int i = 0; tmp > 0; i++)
+			{
+				c[i] = tmp % 10;
+				tmp /= 10;
+				length++;
+			}
+			for (int i = length - 1; i >= 0; i--)
+			{
+				tixTmp[q] += c[i] + '0';
+			}
+			for (int i = 0; i < (4 - length); i++)
+			{
+				tix[q] += "0";
+			}
+			tix[q] += tixTmp[q];
+		}
+
+	}
+	string room[3];
+	bool notFound = false;
+	for (int q = 0; q < 3; q++)
+	{
+		notFound = false;
+		for (int i = 0; i < Patient::pat_NUM; i++)
+		{
+			if ((currentTix-q) == pat[i].getTicket())
+			{
+				for (int j = 0; j < 8; j++)
+				{
+					if (ward[j].getPatient() == &pat[i])
+					{
+						room[q] = j + 'A';
+					}
+				}
+			}
+		}
+		if (notFound)
+		{
+			room[q] = "";
+		}
+	}
+
+
+
+	for (int i = 0; i < 5; i++)
+	{
+		if (i == 0)
+		{
+			cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 25) << allignMid("NOW SERVING", 15,0) << allignMid("ROOM", 10, 0)
+				<< repeat(" ", 30) << "|" << endl;
+		}
+		else if (i == 1)
+		{
+			cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 25) << allignMid(tix[0], 15, 0) << allignMid(room[0], 10, 0)
+				<< repeat(" ", 30) << "|" << endl;
+		}
+		else if (i == 2)
+		{
+			cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 25) << allignMid(tix[1], 15, 0) << allignMid(room[1], 10, 0)
+				<< repeat(" ", 30) << "|" << endl;
+		}
+		else if (i == 3)
+		{
+			cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 25) << allignMid(tix[2], 15, 0) << allignMid(room[2], 10, 0)
+				<< repeat(" ", 30) << "|" << endl;
+		}
+		else
+			cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 80) << "|" << endl;
 	}
 	if (wCount > 5)
 	{
