@@ -102,6 +102,35 @@ void Person::readContact()
 	cin >> foo;
 	contact.setEmail(foo);
 }
+TicketMaster::TicketMaster()
+{
+	ticket = 0;
+}
+int TicketMaster::getTix_NUM()
+{
+	return tix_NUM;
+}
+int TicketMaster::getTicket()const
+{
+	return ticket;
+}
+void TicketMaster::giveTicket()
+{
+	ticket = tix_NUM;
+	tix_NUM++;
+}
+void TicketMaster::setTicket(int t)
+{
+	ticket = t;
+}
+void TicketMaster::reset()
+{
+	ticket = 0;
+}
+void TicketMaster::initTicketNum(int a)
+{
+	tix_NUM = a + 1;
+}
 
 Patient::Patient()
 {
@@ -202,6 +231,11 @@ double Patient::getHeight() const
 	return height;
 }
 
+void Patient::incPatNum()
+{
+	pat_NUM++;
+}
+
 bool Patient::getIsAdmit() const
 {
 	return isAdmit;
@@ -218,6 +252,11 @@ void Patient::setIsAdmit(bool a)
 int Patient::getTicket()const
 {
 	return ticket.getTicket();
+}
+
+int Patient::getPatNum()
+{
+	return pat_NUM;
 }
 
 Doctor::Doctor()
@@ -266,6 +305,18 @@ double Doctor::findSalary() const
 string Doctor::getPosName() const
 {
 	return position;
+}
+int Doctor::getDocNum()
+{
+	return doc_NUM;
+}
+void Doctor::incDocNum()
+{
+	doc_NUM++;
+}
+void Doctor::decDocNum()
+{
+	doc_NUM--;
 }
 void Doctor::readRecord(ifstream &inp)
 {
@@ -396,7 +447,7 @@ bool Ward::getIsStationed() const
 	return isStationed;
 }
 
-Doctor * Ward::getDoctor()
+Doctor * Ward::getDoctor() const
 {
 	return doctor;
 }
