@@ -17,7 +17,7 @@ void displayMenu();
 bool readAllData(ifstream &, Doctor *, Patient *, Ward *, int &);
 int checkNum(int, int);
 int promptInput(string, int, int);
-int waitingList(Patient *, string *);
+int waitingList(Patient *, string *, string *);
 string repeat(string, int);
 string allignMid(string , int , int );
 
@@ -106,18 +106,21 @@ int main()
 			if (pat[i].getIsAdmit() && !pat[i].getIsAssigned())
 				waitingCount++;
 		}
-		int cc = 0;
+		int availCount = 0;
 		for (int i = 0; i < 8; i++)
 		{
 			if (!ward[i].getIsOccupied() && ward[i].getIsStationed())
 			{
-				availWardIndex[cc] = i;
-				cc++;
+				availWardIndex[availCount] = i;
+				availCount++;
 				availableWard++;
 			}
 		}
-		random = rand() % availableWard;
-		cout << random << endl;
+		if (availableWard > 0)
+		{
+			random = rand() % availableWard;
+			//cout << random << endl;
+		}
 		if (admitCount > 0)
 		{
 			for (int i = 0; i < admitCount; i++)
@@ -226,7 +229,7 @@ int main()
 					admitCount++;
 				}
 			}
-			choice = promptInput(username, 1, 3);
+			choice = promptInput(username, 1, 4);
 			if (choice == 1)  // selected patient
 			{
 				if (admitCount == 0)
@@ -241,6 +244,9 @@ int main()
 					for (int i = 0; i < 8; i++)
 						if (ward[i].getPatient() == admit[patNo])
 							wIndex = i;
+					cout << "Patient's information:" << endl;
+					printLine(1);
+					cout << endl;
 					admit[patNo]->display();
 					if (admit[patNo]->getIsAssigned())
 						cout << "\tAssigned to room " << (char)('A' + wIndex) << endl << endl;
@@ -316,11 +322,13 @@ int main()
 				{
 					cout << "Enter patient's IC (without '-') => ";
 					string tmpIC;
+					bool found = false;
 					cin >> tmpIC;
 					for (int i = 0; i < Patient::getPatNum(); i++)
 					{
 						if (pat[i].getIC() == tmpIC)
 						{
+							found = true;
 							if (pat[i].getIsAssigned() || pat[i].getIsAdmit())
 							{
 								cout << "Patient " << pat[i].getName() << " already admitted." << endl;
@@ -334,9 +342,8 @@ int main()
 								{
 									cout << "Patient added." << endl;
 									pat[i].setIsAdmit(true);
-									cout << endl;
 									//assignPatient(&pat[i], ward);
-									cout << pat[i].getName() << " added to waiting list." << endl;
+									cout << pat[i].getName() << " added to waiting list." << endl << endl;
 
 									break;
 								}
@@ -349,11 +356,22 @@ int main()
 						}
 
 					}
+					if (!found)
+						cout << "Record not found." << endl;
 				}
-
 				pressEnter(1);
 			}
-			else if (choice == 3)  // return
+			else if (choice == 3)  // view patient record
+			{
+				cout << "Patient's information:" << endl;
+				printLine(1);
+				cout << endl;
+				for (int i = 0; i < Patient::getPatNum(); i++)
+				{
+					pat[i].display();
+				}
+			}
+			else if (choice == 4)  // return
 			{
 				savePatient(out, pat);
 				choice = 0;
@@ -515,7 +533,8 @@ void patMenu()
 	cout << "  Please select an option" << endl
 		<< "  1. Select patient" << endl
 		<< "  2. Add patient" << endl
-		<< "  3. Go back" << endl
+		<< "  3. View patient record" << endl
+		<< "  4. Go back" << endl
 		<< endl;
 }
 void patMenu(int select)
@@ -661,8 +680,9 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat, int currentTix)
 	cout << "\t|" << repeat(" ", 17) << repeat("* ", 39) << "   |" << endl;
 	cout << "\t|" << allignMid("Waiting List:",17, 0) << repeat(" ", 81) << "|" << endl;
 	string s[MAX];
+	string sWithNum[MAX];
 	int wCount;
-	wCount = waitingList(pat, s);
+	wCount = waitingList(pat, s, sWithNum);
 	string tix[3];
 	string tixTmp[3];
 	int length;
@@ -697,14 +717,15 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat, int currentTix)
 
 	}
 	string room[3];
-	bool notFound = false;
+	bool notFound = true;
 	for (int q = 0; q < 3; q++)
 	{
-		notFound = false;
+		notFound = true;
 		for (int i = 0; i < Patient::getPatNum(); i++)
 		{
 			if ((currentTix-q) == pat[i].getTicket())
 			{
+				notFound = false;
 				for (int j = 0; j < 8; j++)
 				{
 					if (ward[j].getPatient() == &pat[i])
@@ -716,36 +737,33 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat, int currentTix)
 		}
 		if (notFound)
 		{
-			room[q] = "";
+			room[q] = "-";
 		}
 	}
-
-
-
 	for (int i = 0; i < 5; i++)
 	{
 		if (i == 0)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 25) << allignMid("NOW SERVING", 15,0) << allignMid("ROOM", 10, 0)
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 20, 1) << repeat(" ", 20) << allignMid("NOW SERVING", 15,0) << allignMid("ROOM", 10, 0)
 				<< repeat(" ", 30) << "|" << endl;
 		}
 		else if (i == 1)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 25) << allignMid(tix[0], 15, 0) << allignMid(room[0], 10, 0)
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 20, 1) << repeat(" ", 20) << allignMid(tix[0], 15, 0) << allignMid(room[0], 10, 0)
 				<< repeat(" ", 30) << "|" << endl;
 		}
 		else if (i == 2)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 25) << allignMid(tix[1], 15, 0) << allignMid(room[1], 10, 0)
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 20, 1) << repeat(" ", 20) << allignMid(tix[1], 15, 0) << allignMid(room[1], 10, 0)
 				<< repeat(" ", 30) << "|" << endl;
 		}
 		else if (i == 3)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 25) << allignMid(tix[2], 15, 0) << allignMid(room[2], 10, 0)
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 20, 1) << repeat(" ", 20) << allignMid(tix[2], 15, 0) << allignMid(room[2], 10, 0)
 				<< repeat(" ", 30) << "|" << endl;
 		}
 		else
-			cout << "\t| " << i + 1 << "." << allignMid(s[i], 15, 1) << repeat(" ", 80) << "|" << endl;
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 20, 1) << repeat(" ", 75) << "|" << endl;
 	}
 	if (wCount > 5)
 	{
@@ -786,14 +804,39 @@ void dischargePat(Ward *ward, Patient *pat, int wIndex)
 	ward[wIndex].setIsOccupied(false);
 	pat->setIsAssigned(false);
 }
-int waitingList(Patient *pat, string *s)
+int waitingList(Patient *pat, string *s, string *sWithNum)
 {
 	int count = 0;
+	string tixTmp;
+	string tix;
+	int c[5];
+	int tmp;
+	int length = 0;
 	for (int i = 0; i < Patient::getPatNum(); i++)
 	{
 		if (!pat[i].getIsAssigned() && pat[i].getIsAdmit())
 		{
 			s[count] = pat[i].getName();
+			tmp = pat[i].getTicket();
+			for (int i = 0; tmp > 0; i++)
+			{
+				c[i] = tmp % 10;
+				tmp /= 10;
+				length++;
+			}
+			for (int i = length - 1; i >= 0; i--)
+			{
+				tixTmp += c[i] + '0';
+			}
+			for (int i = 0; i < (4 - length); i++)
+			{
+				tix += "0";
+			}
+			tix += tixTmp;
+			sWithNum[count] = pat[i].getName();
+			sWithNum[count] += " (";
+			sWithNum[count] += tix;
+			sWithNum[count] += ")";
 			count++;
 		}
 

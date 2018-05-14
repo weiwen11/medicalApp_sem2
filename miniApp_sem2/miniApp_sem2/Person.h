@@ -23,8 +23,8 @@ protected:
 	string name;
 	string ic;
 	string gender;
-	Contact contact;
 	bool isAssigned;
+	Contact contact;
 public:
 	Person();
 	string getName() const;
@@ -58,7 +58,8 @@ public:
 class Patient : public Person
 {
 	string condition;
-	double height, weight;
+	double height;
+	double weight;
 	bool isAdmit;
 	static int pat_NUM;
 	TicketMaster ticket;
@@ -82,7 +83,7 @@ public:
 };
 class Doctor : public Person
 {
-protected:
+private:
 	string position;
 	double payRate;
 	static int doc_NUM;
@@ -121,11 +122,12 @@ public:
 	double getRate() const;
 
 	void releasePat();
+	void releaseDoc();
 	void setPatient(Patient *);
 	void setIsOccupied(bool);
 	void setIsStationed(bool);
 	void setDoctor(Doctor *);
 	void setRate(double);
-	void doctorPtrAdjust();void releaseDoc();
+	void doctorPtrAdjust();
 };
 #endif // !PERSON_H

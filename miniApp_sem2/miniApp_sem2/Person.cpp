@@ -208,9 +208,7 @@ void Patient::writeRecord(ofstream & out, int i) const
 }
 void Patient::display() const
 {
-	cout << "Patient's information:" << endl;
-	printLine(1);
-	cout << endl;
+	
 	cout << left << setw(4) << "";
 	printPerson();
 	cout << setw(4) << "" << setw(15) << "Height "
