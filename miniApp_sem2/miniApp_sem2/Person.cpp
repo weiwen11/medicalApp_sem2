@@ -103,20 +103,6 @@ void Person::readContact()
 	contact.setEmail(foo);
 }
 
-Employee::Employee()
-{
-	position = "";
-	payRate = 0;
-}
-double Employee::findSalary() const
-{
-	return payRate * 12.00 * 30.0;
-}
-string Employee::getPosName() const
-{
-	return position;
-}
-
 Patient::Patient()
 {
 	condition = "";
@@ -236,6 +222,8 @@ int Patient::getTicket()const
 
 Doctor::Doctor()
 {
+	position = "";
+	payRate = 0;
 }
 void Doctor::addDoc()
 {
@@ -270,6 +258,14 @@ void Doctor::addDoc()
 	readContact();
 	cout << endl;
 	cout << "Record Saved. " << endl;
+}
+double Doctor::findSalary() const
+{
+	return payRate * 12.00 * 30.0;
+}
+string Doctor::getPosName() const
+{
+	return position;
 }
 void Doctor::readRecord(ifstream &inp)
 {

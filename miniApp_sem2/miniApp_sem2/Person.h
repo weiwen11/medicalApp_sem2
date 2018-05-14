@@ -37,16 +37,6 @@ public:
 	void readBasic();
 	void readContact();
 };
-class Employee : public Person
-{
-protected:
-	string position;
-	double payRate;
-public:
-	Employee();
-	double findSalary() const;
-	string getPosName() const;
-};
 class TicketMaster
 {
 	int ticket;
@@ -105,11 +95,15 @@ public:
 	void writeRecord(ofstream &, int) const;
 	void display() const;
 };
-class Doctor : public Employee
+class Doctor : public Person
 {
-
+protected:
+	string position;
+	double payRate;
 public:
 	Doctor();
+	double findSalary() const;
+	string getPosName() const;
 	static int doc_NUM;
 	void addDoc();
 	void readRecord(ifstream &);

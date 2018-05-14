@@ -261,8 +261,8 @@ int main()
 							cout << "Patient " << admit[patNo]->getName() << " is in room ";
 							cout << (char)('A' + wIndex) << endl << endl;
 							ward[wIndex].releasePat();
+							assignPatient(admit[patNo], ward);
 						}
-						assignPatient(admit[patNo], ward);
 						
 						pressEnter(1);
 
@@ -296,8 +296,9 @@ int main()
 			}
 			else if (choice == 2)  // add patient
 			{
-				cout << endl << "  Please select an option" << endl;
-				cout << "  1. Add new patient information" << endl
+				cout << endl 
+					<< "  Please select an option" << endl
+					<< "  1. Add new patient information" << endl
 					<< "  2. Search from records" << endl
 					<< "  3. Go back." << endl;
 				cout << endl;
@@ -307,10 +308,11 @@ int main()
 					pat[Patient::pat_NUM].addPat();
 					pat[Patient::pat_NUM].setIsAdmit(true);
 					cout << endl;
-					assignPatient(&pat[Patient::pat_NUM], ward);
+					//assignPatient(&pat[Patient::pat_NUM], ward);
+					cout << pat[Patient::pat_NUM].getName() << " added to waiting list." << endl;
 					Patient::pat_NUM++;
 				}
-				else
+				else if (choice == 2)
 				{
 					cout << "Enter patient's IC (without '-') => ";
 					string tmpIC;
@@ -333,7 +335,9 @@ int main()
 									cout << "Patient added." << endl;
 									pat[i].setIsAdmit(true);
 									cout << endl;
-									assignPatient(&pat[i], ward);
+									//assignPatient(&pat[i], ward);
+									cout << pat[i].getName() << " added to waiting list." << endl;
+
 									break;
 								}
 								else
@@ -802,24 +806,17 @@ void assignPatient(Patient *pat, Ward *ward)
 	int wardNo;
 	printWardAvail(ward);
 
-	cout << "Assign " << pat->getName() << " to room (A - H)" << endl
-		<< "Enter 'Z' to assign later " << " => ";
+	cout << "Assign " << pat->getName() << " to room (A - H) => ";
 	cin >> chr;
 	chr = toupper(chr);
 	while (cin)
 	{
 		if (chr != 'A' && chr != 'B' && chr != 'C' && chr != 'D' &&
-			chr != 'E' && chr != 'F' && chr != 'G' && chr != 'H' && chr != 'Z')
+			chr != 'E' && chr != 'F' && chr != 'G' && chr != 'H')
 		{
 			cout << "Please enter correct room => ";
 			cin >> chr;
 			chr = toupper(chr);
-		}
-		if (chr == 'Z')
-		{
-			pat->setIsAssigned(false);
-			cout << pat->getName() << " added to waiting list." << endl;
-			break;
 		}
 		else
 		{
