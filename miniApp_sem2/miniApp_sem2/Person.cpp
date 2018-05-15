@@ -139,10 +139,15 @@ Patient::Patient()
 	weight = 0;
 	isAdmit = false;
 }
-void Patient::addPat()
+bool Patient::addPat(Patient *pat)
 {
 	cout << "New patient" << endl << endl;
 	readBasic();
+	for (int i = 0; i < pat_NUM; i++)
+	{
+		if (ic == pat[i].getIC())
+			return false;
+	}
 
 	cout << "\tHeight\t\t"
 		<< "=> ";
@@ -157,6 +162,7 @@ void Patient::addPat()
 	cout << endl << endl;
 	readContact();
 	cout << endl;
+	return true;
 }
 double Patient::getBMI() const
 {

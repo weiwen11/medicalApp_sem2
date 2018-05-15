@@ -65,7 +65,7 @@ class Patient : public Person
 	TicketMaster ticket;
 public:
 	Patient();
-	void addPat();
+	bool addPat(Patient *);
 	double getWeight() const;
 	double getHeight() const;
 	double getBMI() const;

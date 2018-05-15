@@ -311,12 +311,19 @@ int main()
 				choice = promptInput(username, 1, 3);
 				if (choice == 1)
 				{
-					pat[Patient::getPatNum()].addPat();
-					pat[Patient::getPatNum()].setIsAdmit(true);
-					cout << endl;
-					//assignPatient(&pat[Patient::getPatNum()], ward);
-					cout << pat[Patient::getPatNum()].getName() << " added to waiting list." << endl;
-					Patient::incPatNum();
+					if (pat[Patient::getPatNum()].addPat(pat))
+					{
+						pat[Patient::getPatNum()].setIsAdmit(true);
+						cout << endl;
+						//assignPatient(&pat[Patient::getPatNum()], ward);
+						cout << pat[Patient::getPatNum()].getName() << " added to waiting list." << endl;
+						Patient::incPatNum();
+					}
+					else 
+					{
+						cout << "Record contains similar IC. Please check again." << endl;
+					}
+
 				}
 				else if (choice == 2)
 				{
@@ -723,6 +730,11 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat, int currentTix)
 		notFound = true;
 		for (int i = 0; i < Patient::getPatNum(); i++)
 		{
+			if ((currentTix - q) <= 0)
+			{
+				notFound = true;
+				break;
+			}
 			if ((currentTix-q) == pat[i].getTicket())
 			{
 				notFound = false;
@@ -814,6 +826,11 @@ int waitingList(Patient *pat, string *s, string *sWithNum)
 	int length = 0;
 	for (int i = 0; i < Patient::getPatNum(); i++)
 	{
+		tix = "";
+		tixTmp = "";
+		length = 0;
+		for (int j = 0; j < 5; j++)
+			c[j] = 0;
 		if (!pat[i].getIsAssigned() && pat[i].getIsAdmit())
 		{
 			s[count] = pat[i].getName();
