@@ -42,10 +42,8 @@ void printWardAvail(Ward *);
 void printWard(Ward *, Doctor *, Patient *, int);
 
 const int MAX = 1000;
-
 int main()
 {
-
 	string username;
 	string password;
 	Admin admin;
@@ -172,7 +170,8 @@ int main()
 				}
 				if (isFull)
 				{
-					cout << "All rooms are stationed. Unable to add new doctors" << endl << endl;
+					cout << "All rooms are stationed. Unable to add new doctors"
+						<< endl << endl;
 				}
 				else
 				{
@@ -201,7 +200,9 @@ int main()
 					if (ward[wIndex].getIsOccupied() == true)
 					{
 						cout << "Error removing doctor." << endl;
-						cout << "Discharge patient " << ward[wIndex].getPatientName() << " first before removing doctor." << endl
+						cout << "Discharge patient " 
+							<< ward[wIndex].getPatientName() 
+							<< " first before removing doctor." << endl
 							<< endl;
 					}
 					else
@@ -260,8 +261,12 @@ int main()
 					printLine(1);
 					cout << endl;
 					admit[patNo]->display();
+					printLine(2);
 					if (admit[patNo]->getIsAssigned())
-						cout << "\tAssigned to room " << (char)('A' + wIndex) << endl << endl;
+					{
+						cout << "\tAssigned to room " << (char)('A' + wIndex)
+							<< endl << endl;
+					}
 					else
 						cout << "\tNot assigned to any room." << endl << endl;
 
@@ -272,12 +277,16 @@ int main()
 					{
 						if (admit[patNo]->getIsAssigned() == false)
 						{
-							cout << "Patient " << admit[patNo]->getName() << " is not assigned to any room." << endl << endl;
+							cout << "Patient " << admit[patNo]->getName() 
+								<< " is not assigned to any room." 
+								<< endl << endl;
 						}
 						else
 						{
-							cout << "Patient " << admit[patNo]->getName() << " is in room ";
-							cout << (char)('A' + wIndex) << endl << endl;
+							cout << "Patient " << admit[patNo]->getName() 
+								<< " is in room "
+								<< (char)('A' + wIndex) 
+								<< endl << endl;
 							ward[wIndex].releasePat();
 							assignPatient(admit[patNo], ward);
 						}
@@ -287,7 +296,8 @@ int main()
 					}
 					else if (choice == 2) // discharge patient
 					{
-						cout << "Confirm to discharge '" << admit[patNo]->getName() << "'? (Y / n): ";
+						cout << "Confirm to discharge '" 
+							<< admit[patNo]->getName() << "'? (Y / n): ";
 						string yesno;
 						cin >> yesno;
 						if (yesno == "Y")
@@ -296,7 +306,7 @@ int main()
 							admit[patNo]->setIsAdmit(false);
 							for (int i = 0; i < 8; i++) 
 							{
-								if (ward[i].getPatient() == admit[patNo])  // finds patient's room and set it NULL
+								if (ward[i].getPatient() == admit[patNo])  
 								{
 									ward[i].releasePat();
 								}
@@ -315,10 +325,10 @@ int main()
 			else if (choice == 2)  // add patient
 			{
 				cout << endl 
-					<< "  Please select an option" << endl
-					<< "  1. Add new patient information" << endl
-					<< "  2. Search from records" << endl
-					<< "  3. Go back." << endl;
+					<< "      Please select an option" << endl
+					<< "      1. Add new patient information" << endl
+					<< "      2. Search from records" << endl
+					<< "      3. Go back." << endl;
 				cout << endl;
 				choice = promptInput(username, 1, 3);
 				if (choice == 1)
@@ -328,12 +338,14 @@ int main()
 						pat[Patient::getPatNum()].setIsAdmit(true);
 						cout << endl;
 						//assignPatient(&pat[Patient::getPatNum()], ward);
-						cout << pat[Patient::getPatNum()].getName() << " added to waiting list." << endl;
+						cout << pat[Patient::getPatNum()].getName() 
+							<< " added to waiting list." << endl;
 						Patient::incPatNum();
 					}
 					else 
 					{
-						cout << "Record contains similar IC. Please check again." << endl;
+						cout << "Record contains similar IC" 
+							<< " Please check again." << endl;
 					}
 
 				}
@@ -350,11 +362,13 @@ int main()
 							found = true;
 							if (pat[i].getIsAssigned() || pat[i].getIsAdmit())
 							{
-								cout << "Patient " << pat[i].getName() << " already admitted." << endl;
+								cout << "Patient " << pat[i].getName() 
+									<< " already admitted." << endl;
 							}
 							else
 							{
-								cout << "Match found. Confirm to add " << pat[i].getName() << " ? (Y / n) => ";
+								cout << "Match found. Confirm to add " 
+									<< pat[i].getName() << " ? (Y / n) => ";
 								string yesno;
 								cin >> yesno;
 								if (yesno == "Y")
@@ -362,7 +376,9 @@ int main()
 									cout << "Patient added." << endl;
 									pat[i].setIsAdmit(true);
 									//assignPatient(&pat[i], ward);
-									cout << pat[i].getName() << " added to waiting list." << endl << endl;
+									cout << pat[i].getName() 
+										<< " added to waiting list." 
+										<< endl << endl;
 
 									break;
 								}
@@ -388,6 +404,7 @@ int main()
 				for (int i = 0; i < Patient::getPatNum(); i++)
 				{
 					pat[i].display();
+					printLine(2);
 				}
 			}
 			else if (choice == 4)  // return
@@ -405,7 +422,8 @@ int main()
 				currentTix++;
 			else
 			{
-				cout << "No patients in waiting list or no rooms available." << endl;
+				cout << "No patients in waiting list or no rooms available." 
+					<< endl;
 				pressEnter(1);
 			}
 			choice = 0;
@@ -415,7 +433,8 @@ int main()
 		{
 			if (admitCount != 0)
 			{
-				cout << "Please discharge all patients before resetting." << endl;
+				cout << "Please discharge all patients before resetting." 
+					<< endl;
 				pressEnter(1);
 			}
 			else
@@ -455,7 +474,8 @@ void initError(ofstream &out)
 		out.close();
 		out.open("ward.txt");
 		out.close();
-		cout << "Previous data deleted. Please restart the program now." << endl;
+		cout << "Previous data deleted. Please restart the program now." 
+			<< endl;
 		exit(1);
 	}
 	else
@@ -488,7 +508,8 @@ void deleteDoctor(Doctor* doc, int docNo, Ward * ward, int wIndex)
 	}
 	else
 	{
-		cout << "Doctor " << doc[docNo].getName() << " not removed." << endl << endl;
+		cout << "Doctor " << doc[docNo].getName() << " not removed." 
+			<< endl << endl;
 	}
 }
 
@@ -496,7 +517,8 @@ void assignDoctor(Ward*  ward, Doctor*  doc)
 {
 	printWardAvail(ward);
 
-	cout << "Assign " << doc[Doctor::getDocNum()].getName() << " to room (A - H) => ";
+	cout << "Assign " << doc[Doctor::getDocNum()].getName() 
+		<< " to room (A - H) => ";
 	char chr;
 	int wardNo;
 	cin >> chr;
@@ -516,12 +538,14 @@ void assignDoctor(Ward*  ward, Doctor*  doc)
 			if (ward[wardNo].getIsStationed() == 0)
 			{
 				ward[wardNo].setDoctor(&doc[Doctor::getDocNum()]);
-				cout << doc[Doctor::getDocNum()].getName() << " stationed to room " << chr << endl;
+				cout << doc[Doctor::getDocNum()].getName() 
+					<< " stationed to room " << chr << endl;
 				break;
 			}
 			else
 			{
-				cout << "Room " << chr << " is stationed by " << ward[wardNo].getDoctorName() << endl;
+				cout << "Room " << chr << " is stationed by " 
+					<< ward[wardNo].getDoctorName() << endl;
 				cout << "Please enter another room => ";
 				cin >> chr;
 				chr = toupper(chr);
@@ -561,28 +585,28 @@ void displayMenu()
 }
 void doctorMenu()
 {
-	cout << "  Please select an option" << endl
-		<< "  1. Expand information" << endl
-		<< "  2. Add doctor" << endl
-		<< "  3. Remove doctor" << endl
-		<< "  4. Go back" << endl
+	cout << "    Please select an option" << endl
+		<< "    1. Expand information" << endl
+		<< "    2. Add doctor" << endl
+		<< "    3. Remove doctor" << endl
+		<< "    4. Go back" << endl
 		<< endl;
 }
 void patMenu()
 {
-	cout << "  Please select an option" << endl
-		<< "  1. Select patient" << endl
-		<< "  2. Add patient" << endl
-		<< "  3. View patient record" << endl
-		<< "  4. Go back" << endl
+	cout << "    Please select an option" << endl
+		<< "    1. Select patient" << endl
+		<< "    2. Add patient" << endl
+		<< "    3. View patient record" << endl
+		<< "    4. Go back" << endl
 		<< endl;
 }
 void patMenu(int select)
 {
-	cout << "  Please select an option" << endl
-		<< "  1. Set / change room" << endl
-		<< "  2. Discharge patient" << endl
-		<< "  3. Go back" << endl << endl;
+	cout << "      Please select an option" << endl
+		<< "      1. Change room" << endl
+		<< "      2. Discharge patient" << endl
+		<< "      3. Go back" << endl << endl;
 }
 
 void docList(Doctor * p)
@@ -631,7 +655,8 @@ void printLine(int x)
 	if (x == 1)
 		cout << "-----------------------------" << endl;
 	else if (x == 2)
-		cout << "----------------------------------------------------------------------------------------------" << endl;
+		cout << "---------------------------------------------------------" 
+		<< "-------------------------------------" << endl;
 }
 int promptInput(string username, int min, int max)
 {
@@ -697,28 +722,37 @@ void printWardAvail(Ward *ward)
 void printWard(Ward *ward, Doctor * doc, Patient * pat, int currentTix)
 {
 	cout << "\t" << repeat("-", 100) << endl;
-	cout << "\t|" << repeat(" ", 17) << repeat(" ", 9) << "A" << repeat(" ", 18) << "B" 
-		 << repeat(" ", 18) << "C" << repeat(" ", 18) << "D" << repeat(" ", 14) << "|" << endl;
+	cout << "\t|" << repeat(" ", 17) << repeat(" ", 9) << "A" 
+		<< repeat(" ", 18) << "B" << repeat(" ", 18) << "C" 
+		<< repeat(" ", 18) << "D" << repeat(" ", 14) << "|" << endl;
 	cout << "\t|" << repeat(" ", 17) << repeat("* ", 39) << "   |" << endl;
 	for (int i = 0; i < 5; i++)
 	{
 		if (i == 2)
 		{
-			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[0].getPatientName(), 18, 0) << "*" 
-				<< allignMid(ward[1].getPatientName() , 18, 0) << "*" << allignMid(ward[2].getPatientName(), 18, 0) << "*" 
-				<< allignMid(ward[3].getPatientName(), 18, 0) << "*" << "    |" << endl;
+			cout << "\t|" << repeat(" ", 17) << '*' 
+				<< allignMid(ward[0].getPatientName(), 18, 0) << "*" 
+				<< allignMid(ward[1].getPatientName() , 18, 0) << "*" 
+				<< allignMid(ward[2].getPatientName(), 18, 0) << "*" 
+				<< allignMid(ward[3].getPatientName(), 18, 0) << "*" 
+				<< "    |" << endl;
 		}
 		if (i == 3)
 		{
-			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[0].getDoctorNameInBracket(), 18, 0) << "*" 
-				<< allignMid(ward[1].getDoctorNameInBracket(), 18, 0) << "*" << allignMid(ward[2].getDoctorNameInBracket(), 18, 0) << "*" 
-				<< allignMid(ward[3].getDoctorNameInBracket(), 18, 0) << "*" << "    |" << endl;
+			cout << "\t|" << repeat(" ", 17) << '*' 
+				<< allignMid(ward[0].getDoctorNameInBracket(), 18, 0) << "*" 
+				<< allignMid(ward[1].getDoctorNameInBracket(), 18, 0) << "*" 
+				<< allignMid(ward[2].getDoctorNameInBracket(), 18, 0) << "*" 
+				<< allignMid(ward[3].getDoctorNameInBracket(), 18, 0) << "*" 
+				<< "    |" << endl;
 		}
-		cout << "\t|" << repeat(" ", 17) << '*' << repeat(" ", 18) << "*" << repeat(" ", 18)
-			 << "*"<< repeat (" ",18) << "*" << repeat(" ", 18) << "*" << "    |" << endl;
+		cout << "\t|" << repeat(" ", 17) << '*' << repeat(" ", 18) << "*" 
+			<< repeat(" ", 18) << "*"<< repeat (" ",18) << "*" 
+			<< repeat(" ", 18) << "*" << "    |" << endl;
 	}
 	cout << "\t|" << repeat(" ", 17) << repeat("* ", 39) << "   |" << endl;
-	cout << "\t|" << allignMid("Waiting List:",17, 0) << repeat(" ", 81) << "|" << endl;
+	cout << "\t|" << allignMid("Waiting List:",17, 0) << repeat(" ", 81) 
+		<< "|" << endl;
 	string s[MAX];
 	string sWithNum[MAX];
 	int wCount;
@@ -791,26 +825,37 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat, int currentTix)
 	{
 		if (i == 0)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) << repeat(" ", 10) << allignMid("NOW SERVING", 15,0) << allignMid("ROOM", 10, 0)
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) 
+				<< repeat(" ", 10) << allignMid("NOW SERVING", 15,0) 
+				<< allignMid("ROOM", 10, 0)
 				<< repeat(" ", 30) << "|" << endl;
 		}
 		else if (i == 1)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) << repeat(" ", 10) << allignMid(tix[0], 15, 0) << allignMid(room[0], 10, 0)
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) 
+				<< repeat(" ", 10) << allignMid(tix[0], 15, 0) 
+				<< allignMid(room[0], 10, 0)
 				<< repeat(" ", 30) << "|" << endl;
 		}
 		else if (i == 2)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) << repeat(" ", 10) << allignMid(tix[1], 15, 0) << allignMid(room[1], 10, 0)
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) 
+				<< repeat(" ", 10) << allignMid(tix[1], 15, 0) 
+				<< allignMid(room[1], 10, 0)
 				<< repeat(" ", 30) << "|" << endl;
 		}
 		else if (i == 3)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) << repeat(" ", 10) << allignMid(tix[2], 15, 0) << allignMid(room[2], 10, 0)
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) 
+				<< repeat(" ", 10) << allignMid(tix[2], 15, 0) 
+				<< allignMid(room[2], 10, 0)
 				<< repeat(" ", 30) << "|" << endl;
 		}
 		else
-			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) << repeat(" ", 65) << "|" << endl;
+		{
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1)
+				<< repeat(" ", 65) << "|" << endl;
+		}
 	}
 	if (wCount > 5)
 	{
@@ -819,29 +864,38 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat, int currentTix)
 		string cat = "+ ";
 		cat += overFlow;
 		cat += " more";
-		cout << "\t|" << allignMid(cat , 17, 0) << repeat(" ", 81) << "|" << endl;
+		cout << "\t|" << allignMid(cat , 17, 0) << repeat(" ", 81) << "|" 
+			<< endl;
 	}
 	cout << "\t|" << repeat(" ", 17) << repeat("* ", 39) << "   |" << endl;
 	for (int i = 0; i < 5; i++)
 	{
 		if (i == 2)
 		{
-			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[4].getPatientName(), 18, 0) << "*" 
-				<< allignMid(ward[5].getPatientName(), 18, 0) << "*" << allignMid(ward[6].getPatientName(), 18, 0) << "*" 
-				<< allignMid(ward[7].getPatientName(), 18, 0) << "*" << "    |" << endl;
+			cout << "\t|" << repeat(" ", 17) << '*' 
+				<< allignMid(ward[4].getPatientName(), 18, 0) << "*" 
+				<< allignMid(ward[5].getPatientName(), 18, 0) << "*" 
+				<< allignMid(ward[6].getPatientName(), 18, 0) << "*" 
+				<< allignMid(ward[7].getPatientName(), 18, 0) << "*" 
+				<< "    |" << endl;
 		}
 		if (i == 3)
 		{
-			cout << "\t|" << repeat(" ", 17) << '*' << allignMid(ward[4].getDoctorNameInBracket(), 18, 0) << "*" 
-				<< allignMid(ward[5].getDoctorNameInBracket(), 18, 0) << "*" << allignMid(ward[6].getDoctorNameInBracket(), 18, 0) << "*" 
-				<< allignMid(ward[7].getDoctorNameInBracket(), 18, 0) << "*" << "    |" << endl;
+			cout << "\t|" << repeat(" ", 17) << '*' 
+				<< allignMid(ward[4].getDoctorNameInBracket(), 18, 0) << "*" 
+				<< allignMid(ward[5].getDoctorNameInBracket(), 18, 0) << "*" 
+				<< allignMid(ward[6].getDoctorNameInBracket(), 18, 0) << "*" 
+				<< allignMid(ward[7].getDoctorNameInBracket(), 18, 0) << "*" 
+				<< "    |" << endl;
 		}
-		cout << "\t|" << repeat(" ", 17) << '*' << repeat(" ", 18) << "*" << repeat(" ", 18)
-			 << "*"<< repeat (" ",18) << "*" << repeat(" ", 18) << "*" << "    |" << endl;
+		cout << "\t|" << repeat(" ", 17) << '*' << repeat(" ", 18) << "*" 
+			<< repeat(" ", 18) << "*"<< repeat (" ",18) << "*" 
+			<< repeat(" ", 18) << "*" << "    |" << endl;
 	}
 	cout << "\t|" << repeat(" ", 17) << repeat("* ", 39) << "   |" << endl;
-	cout << "\t|" << repeat(" ", 17) << repeat(" ", 9) << "E" << repeat(" ", 18) << "F"
-		 << repeat(" ", 18) << "G" << repeat(" ", 18) << "H" << repeat(" ", 14) << "|" << endl;
+	cout << "\t|" << repeat(" ", 17) << repeat(" ", 9) << "E" 
+		<< repeat(" ", 18) << "F" << repeat(" ", 18) << "G" << repeat(" ", 18) 
+		<< "H" << repeat(" ", 14) << "|" << endl;
 	cout << "\t" << repeat("-", 100) << endl;
 	cout << endl;
 }
@@ -931,7 +985,8 @@ void assignPatient(Patient *pat, Ward *ward)
 			}
 			else
 			{
-				cout << "Room " << chr << " is occupied by " << ward[wardNo].getPatient()->getName() << endl;
+				cout << "Room " << chr << " is occupied by " 
+					<< ward[wardNo].getPatient()->getName() << endl;
 				cout << "Please enter another room => ";
 				cin >> chr;
 				chr = toupper(chr);
@@ -939,7 +994,8 @@ void assignPatient(Patient *pat, Ward *ward)
 		}
 	}
 }
-bool readAllData(ifstream &inp, Doctor *doc, Patient *pat, Ward *ward, int &currentTix)
+bool readAllData(ifstream &inp, Doctor *doc, 
+	             Patient *pat, Ward *ward, int &currentTix)
 {
 	int fileCount = 0;
 	bool error = false;
