@@ -9,6 +9,47 @@ int Doctor::doc_NUM = 0;
 int Patient::pat_NUM = 0;
 
 void printLine(int);
+
+string Admin::getUsername()
+{
+	return username;
+}
+
+string Admin::getPW()
+{
+	return password;
+}
+void Admin::init()
+{
+	cout << "New login info." << endl;
+	cout << "Username: ";
+	cin.getline(username, 20);
+	cout << "Password: ";
+	cin.getline(password, 20);
+	cout << "Record saved." << endl;
+}
+
+bool Admin::readRecord()
+{
+	fstream bin;
+	bin.open("config", ios::in | ios::binary);
+	if (!bin)
+		return false;
+	bin.read(username, 20 * sizeof(char));
+	bin.read(password, 20 * sizeof(char));
+	bin.close();
+	return true;
+}
+
+void Admin::writeRecord()
+{
+	fstream bout;
+	bout.open("config", ios::out | ios::binary);
+	bout.write(username, 20*sizeof(char));
+	bout.write(password, 20*sizeof(char));
+	bout.close();
+}
+
 Contact::Contact()
 {
 	email = "";
@@ -131,7 +172,7 @@ void TicketMaster::initTicketNum(int a)
 {
 	tix_NUM = a + 1;
 }
-
+int TicketMaster::tix_NUM = 1;
 Patient::Patient()
 {
 	condition = "";

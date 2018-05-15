@@ -27,6 +27,7 @@ void docList(Doctor *);
 void printAllDocInfo(Doctor  *);
 void assignDoctor(Ward * ward, Doctor * doc);
 void deleteDoctor(Doctor * doc, int docNo, Ward * ward, int wIndex);
+void initError(ofstream &out);
 void saveDoctor(ofstream &, Doctor *);
 
 // Patient's standalone function
@@ -40,13 +41,39 @@ void assignPatient(Patient *, Ward *);
 void printWardAvail(Ward *);
 void printWard(Ward *, Doctor *, Patient *, int);
 
-
-int TicketMaster::tix_NUM = 1;
 const int MAX = 1000;
+
 int main()
 {
-	string username = "weiwen";
+
+	string username;
+	string password;
+	Admin admin;
+	bool login = false;
+	if (!admin.readRecord())
+	{
+		admin.init();
+		username = admin.getUsername();
+		admin.writeRecord();
+	}
+	else
+	{
+		cout << "Please enter username and password to login." << endl << endl;
+		while (!login)
+		{
+			cout << "username: ";
+			getline(cin, username);
+			cout << "password: ";
+			getline(cin, password);
+			cout << endl;
+			if (username == admin.getUsername() && password == admin.getPW())
+			{
+				login = true;
+			}
+		}
+	}
 	cout << fixed << setprecision(2);
+
 	Doctor doc[20];
 	Patient pat[MAX];
 	Patient *admit[MAX];
@@ -55,27 +82,12 @@ int main()
 	ifstream inp;
 	ofstream out;
 	int currentTix = 0;
+
 	// input doctor and patient and ward data
 	bool error = readAllData(inp, doc, pat, ward, currentTix);
 	if (error)
 	{
-		cout << "Program initialization error." << endl
-			<< "Press 'Y' to delete previous data, 'n' to exit program. :";
-		char del;
-		cin >> del;
-		if (del == 'Y')
-		{
-			out.open("doctor.txt");
-			out.close();
-			out.open("patient.txt");
-			out.close();
-			out.open("ward.txt");
-			out.close();
-			cout << "Previous data deleted. Please restart the program now." << endl;
-			return 0;
-		}
-		else
-			return 0;
+		initError(out);
 	}
 	TicketMaster::initTicketNum(currentTix);
 	
@@ -429,6 +441,27 @@ int main()
 	return 0;
 }
 
+void initError(ofstream &out)
+{
+	cout << "Program initialization error." << endl
+		<< "Press 'Y' to delete previous data, 'n' to exit program. :";
+	char del;
+	cin >> del;
+	if (del == 'Y')
+	{
+		out.open("doctor.txt");
+		out.close();
+		out.open("patient.txt");
+		out.close();
+		out.open("ward.txt");
+		out.close();
+		cout << "Previous data deleted. Please restart the program now." << endl;
+		exit(1);
+	}
+	else
+		exit(1);
+}
+
 void deleteDoctor(Doctor* doc, int docNo, Ward * ward, int wIndex)
 {
 	cout << "Confirm to remove '" << doc[docNo].getName() << "'? (Y / n): ";
@@ -694,10 +727,12 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat, int currentTix)
 	string tixTmp[3];
 	int length;
 	int tmp;
+	int c[4];
 	for (int q = 0; q < 3; q++)
 	{
 		length = 0;
-		int c[4];
+		for (int h = 0; h < 4; h++)
+			c[h] = 0;
 		tmp = currentTix - q;
 		if (tmp < 0)
 		{
@@ -756,26 +791,26 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat, int currentTix)
 	{
 		if (i == 0)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 20, 1) << repeat(" ", 20) << allignMid("NOW SERVING", 15,0) << allignMid("ROOM", 10, 0)
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) << repeat(" ", 10) << allignMid("NOW SERVING", 15,0) << allignMid("ROOM", 10, 0)
 				<< repeat(" ", 30) << "|" << endl;
 		}
 		else if (i == 1)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 20, 1) << repeat(" ", 20) << allignMid(tix[0], 15, 0) << allignMid(room[0], 10, 0)
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) << repeat(" ", 10) << allignMid(tix[0], 15, 0) << allignMid(room[0], 10, 0)
 				<< repeat(" ", 30) << "|" << endl;
 		}
 		else if (i == 2)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 20, 1) << repeat(" ", 20) << allignMid(tix[1], 15, 0) << allignMid(room[1], 10, 0)
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) << repeat(" ", 10) << allignMid(tix[1], 15, 0) << allignMid(room[1], 10, 0)
 				<< repeat(" ", 30) << "|" << endl;
 		}
 		else if (i == 3)
 		{
-			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 20, 1) << repeat(" ", 20) << allignMid(tix[2], 15, 0) << allignMid(room[2], 10, 0)
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) << repeat(" ", 10) << allignMid(tix[2], 15, 0) << allignMid(room[2], 10, 0)
 				<< repeat(" ", 30) << "|" << endl;
 		}
 		else
-			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 20, 1) << repeat(" ", 75) << "|" << endl;
+			cout << "\t| " << i + 1 << "." << allignMid(sWithNum[i], 30, 1) << repeat(" ", 65) << "|" << endl;
 	}
 	if (wCount > 5)
 	{
@@ -912,7 +947,6 @@ bool readAllData(ifstream &inp, Doctor *doc, Patient *pat, Ward *ward, int &curr
 	if (!inp)
 	{
 		fileCount++;
-		cout << "Creating patient.txt..." << endl;
 	}
 	else
 	{
@@ -925,7 +959,6 @@ bool readAllData(ifstream &inp, Doctor *doc, Patient *pat, Ward *ward, int &curr
 	if (!inp)
 	{
 		fileCount++;
-		cout << "Creating doctor.txt..." << endl;
 	}
 	else
 	{
@@ -939,7 +972,6 @@ bool readAllData(ifstream &inp, Doctor *doc, Patient *pat, Ward *ward, int &curr
 	if (!inp)
 	{
 		fileCount++;
-		cout << "Creating ward.txt..." << endl;
 	}
 	else
 	{

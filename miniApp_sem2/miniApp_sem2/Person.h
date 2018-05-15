@@ -5,6 +5,20 @@
 #include <iostream>
 #include <string>
 using namespace std;
+
+class Admin
+{
+private:
+	char username[20];
+	char password[20];
+public:
+	string getUsername();
+	string getPW();
+	void init();
+	bool readRecord();
+	void writeRecord();
+};
+
 class Contact
 {
 private:
