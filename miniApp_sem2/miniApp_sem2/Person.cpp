@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
+#include <cmath>
 #include "Person.h"
 
 using namespace std;
@@ -95,6 +96,18 @@ string Person::getContactEmail() const
 {
 	return contact.getEmail();
 }
+void Person::setName(string n)
+{
+	name = n;
+}
+void Person::setIC(string i)
+{
+	ic = i;
+}
+Contact * Person::getContact()
+{
+	return &contact;
+}
 void Person::printPerson() const
 {
 	cout << setw(15) << "Name"
@@ -170,7 +183,7 @@ void TicketMaster::reset()
 }
 void TicketMaster::initTicketNum(int a)
 {
-	tix_NUM = a + 1;
+	tix_NUM = a;
 }
 int TicketMaster::tix_NUM = 1;
 Patient::Patient()
@@ -249,7 +262,8 @@ void Patient::writeRecord(ofstream & out, int i) const
 {
 	out << name << "," << gender << "," << contact.getPhoneNum() << ","
 		<< contact.getEmail() << "," << ic << ","
-		<< condition << "," << height << " " << weight << " " << isAssigned << " " << isAdmit << " " << ticket.getTicket();
+		<< condition << "," << height << " " << weight << " " 
+		<< isAssigned << " " << isAdmit << " " << ticket.getTicket();
 	if (i != pat_NUM - 1)
 		out << endl;
 }
@@ -286,6 +300,18 @@ bool Patient::getIsAdmit() const
 	return isAdmit;
 }
 
+void Patient::setHeight(double h)
+{
+	height = h;
+}
+void Patient::setWeight(double w)
+{
+	weight = w;
+}
+void Patient::setCond(string c)
+{
+	condition = c;
+}
 void Patient::setIsAdmit(bool a)
 {
 	isAdmit = a;
@@ -452,7 +478,6 @@ Ward::Ward()
 	doctor = NULL;
 	isOccupied = false;
 	isStationed = false;
-	rate = 0;
 }
 void Ward::setPatient(Patient *p)
 {
@@ -475,11 +500,6 @@ void Ward::setDoctor(Doctor *d)
 {
 	doctor = d;
 	isStationed = true;
-}
-
-void Ward::setRate(double r)
-{
-	rate = r;
 }
 
 void Ward::doctorPtrAdjust()
@@ -548,11 +568,6 @@ string Ward::getAvail() const
 		s += "";
 		return s;
 	}
-}
-
-double Ward::getRate() const
-{
-	return rate;
 }
 
 

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <ctime>
+#include <sstream>
 #include "Person.h"
 using namespace std;
 
@@ -48,7 +49,7 @@ int main()
 	string password;
 	Admin admin;
 	bool login = false;
-	if (!admin.readRecord())
+	if (!admin.readRecord())  // initialize username/password if no file found
 	{
 		admin.init();
 		username = admin.getUsername();
@@ -63,11 +64,13 @@ int main()
 			getline(cin, username);
 			cout << "password: ";
 			getline(cin, password);
-			cout << endl;
+			
 			if (username == admin.getUsername() && password == admin.getPW())
 			{
 				login = true;
+				break;
 			}
+			cout << "Wrong username or password." << endl << endl;
 		}
 	}
 	cout << fixed << setprecision(2);
@@ -81,13 +84,12 @@ int main()
 	ofstream out;
 	int currentTix = 0;
 
-	// input doctor and patient and ward data
-	bool error = readAllData(inp, doc, pat, ward, currentTix);
+	// input doctor and patient and ward data, error if some file missing
+	bool error = readAllData(inp, doc, pat, ward, currentTix);  
 	if (error)
 	{
 		initError(out);
 	}
-	TicketMaster::initTicketNum(currentTix);
 	
 	int admitCount = 0;
 	int waitingCount = 0;
@@ -106,7 +108,7 @@ int main()
 		admitCount = 0;
 		for (int i = 0; i < MAX; i++)
 			admit[i] = NULL;
-		for (int i = 0; i < Patient::getPatNum(); i++)
+		for (int i = 0; i < Patient::getPatNum(); i++) 
 		{
 			if (pat[i].getIsAdmit())
 			{
@@ -273,7 +275,7 @@ int main()
 					patMenu(1);
 
 					choice = promptInput(username, 1, 4);
-					if (choice == 1)  // set / change room
+					if (choice == 1)  // change room
 					{
 						if (admit[patNo]->getIsAssigned() == false)
 						{
@@ -294,7 +296,94 @@ int main()
 						pressEnter(1);
 
 					}
-					else if (choice == 2) // discharge patient
+					else if (choice == 2) // update info
+					{
+						cout << "      Please select an option" << endl
+							<< "      1. Name" << endl
+							<< "      2. IC" << endl
+							<< "      3. Height" << endl
+							<< "      4. Weight" << endl
+							<< "      5. Condition" << endl
+							<< "      6. Phone Number" << endl
+							<< "      7. Email" << endl
+							<< "      8. Cancel" << endl << endl;
+						choice = promptInput(username, 1, 8);
+						if (choice == 1)
+						{
+							string nName;
+							cout << "Enter new name => ";
+							cin.ignore();
+							getline(cin, nName);
+							pat[patNo].setName(nName);
+						}
+						else if (choice == 2)
+						{
+							string nIC;
+							bool dup = false;
+							cout << "Enter new IC => ";
+							cin.ignore();
+							getline(cin, nIC);
+							
+							for (int h = 0; h < Patient::getPatNum(); h++)
+							{
+								if (h == patNo)
+									continue;
+								if (pat[h].getIC() == nIC)
+									dup = true;
+							}
+							if (!dup)
+							{
+								pat[patNo].setIC(nIC);
+								cout << "IC changed" << endl;
+							}	
+							else
+							{
+								cout << "Similar IC found. "
+								<< "Please check again." << endl
+								<< "IC not changed." << endl;
+							}
+						}
+						else if (choice == 3)
+						{
+							double newH;
+							cout << "Enter new height => ";
+							cin >> newH;
+							pat[patNo].setHeight(newH);
+						}
+						else if (choice == 4)
+						{
+							double newW;
+							cout << "Enter new weight => ";
+							cin >> newW;
+							pat[patNo].setWeight(newW);
+						}
+						else if (choice == 5)
+						{
+							string cond;
+							cout << "Enter new condition => ";
+							cin.ignore();
+							getline(cin, cond);
+							pat[patNo].setCond(cond);
+						}
+						else if (choice == 6)
+						{
+							string pNum;
+							cout << "Enter new phone number => ";
+							cin.ignore();
+							getline(cin, pNum);
+							pat[patNo].getContact()->setPhone(pNum);
+						}
+						else if (choice == 7)
+						{
+							string nEmail;
+							cout << "Enter new email => ";
+							cin.ignore();
+							getline(cin, nEmail);
+							pat[patNo].getContact()->setEmail(nEmail);
+						}
+							
+					}
+					else if (choice == 3) // discharge patient
 					{
 						cout << "Confirm to discharge '" 
 							<< admit[patNo]->getName() << "'? (Y / n): ";
@@ -324,8 +413,7 @@ int main()
 			}
 			else if (choice == 2)  // add patient
 			{
-				cout << endl 
-					<< "      Please select an option" << endl
+				cout << "      Please select an option" << endl
 					<< "      1. Add new patient information" << endl
 					<< "      2. Search from records" << endl
 					<< "      3. Go back." << endl;
@@ -339,7 +427,9 @@ int main()
 						cout << endl;
 						//assignPatient(&pat[Patient::getPatNum()], ward);
 						cout << pat[Patient::getPatNum()].getName() 
-							<< " added to waiting list." << endl;
+							<< " added to waiting list with ticket number " 
+							<<  pat[Patient::getPatNum()].getTicket()
+							<< endl;
 						Patient::incPatNum();
 					}
 					else 
@@ -377,7 +467,8 @@ int main()
 									pat[i].setIsAdmit(true);
 									//assignPatient(&pat[i], ward);
 									cout << pat[i].getName() 
-										<< " added to waiting list." 
+										<< " added to waiting list with ticket number " 
+										<< pat[i].getTicket()
 										<< endl << endl;
 
 									break;
@@ -440,7 +531,7 @@ int main()
 			else
 			{
 				currentTix = 0;
-				TicketMaster::initTicketNum(0);
+				TicketMaster::initTicketNum(1);
 			}
 			choice = 0;
 		}
@@ -455,7 +546,7 @@ int main()
 	out.open("ward.txt", ios::out);
 	for (int i = 0; i < 8; i++)
 		out << ward[i].getDoctorIC() << "," << ward[i].getPatientIC() << endl;
-	out << currentTix;
+	out << currentTix << " " << TicketMaster::getTix_NUM();
 	out.close();
 	return 0;
 }
@@ -605,8 +696,9 @@ void patMenu(int select)
 {
 	cout << "      Please select an option" << endl
 		<< "      1. Change room" << endl
-		<< "      2. Discharge patient" << endl
-		<< "      3. Go back" << endl << endl;
+		<< "      2. Update info" << endl
+		<< "      3. Discharge patient" << endl
+		<< "      4. Go back" << endl << endl;
 }
 
 void docList(Doctor * p)
@@ -860,7 +952,10 @@ void printWard(Ward *ward, Doctor * doc, Patient * pat, int currentTix)
 	if (wCount > 5)
 	{
 		int tmp = wCount - 5;
-		string overFlow = to_string(tmp);
+		string overFlow;
+		stringstream sout;
+		sout << tmp;
+		overFlow = sout.str();
 		string cat = "+ ";
 		cat += overFlow;
 		cat += " more";
@@ -924,17 +1019,17 @@ int waitingList(Patient *pat, string *s, string *sWithNum)
 		{
 			s[count] = pat[i].getName();
 			tmp = pat[i].getTicket();
-			for (int i = 0; tmp > 0; i++)
+			for (int n = 0; tmp > 0; n++)
 			{
-				c[i] = tmp % 10;
+				c[n] = tmp % 10;
 				tmp /= 10;
 				length++;
 			}
-			for (int i = length - 1; i >= 0; i--)
+			for (int n = length - 1; n >= 0; n--)
 			{
-				tixTmp += c[i] + '0';
+				tixTmp += c[n] + '0';
 			}
-			for (int i = 0; i < (4 - length); i++)
+			for (int n = 0; n < (4 - length); n++)
 			{
 				tix += "0";
 			}
@@ -1056,7 +1151,9 @@ bool readAllData(ifstream &inp, Doctor *doc,
 				}
 			}
 		}
-		inp >> currentTix;
+		int tmpTix;
+		inp >> currentTix >> tmpTix;
+		TicketMaster::initTicketNum(tmpTix);
 	}
 	inp.close();
 	if (fileCount != 3 && fileCount != 0)
@@ -1122,3 +1219,4 @@ string repeat(string a, int max)
 		s += a;
 	return s;
 }
+

@@ -2,8 +2,6 @@
 #define PERSON_H
 
 #include <fstream>
-#include <iostream>
-#include <string>
 using namespace std;
 
 class Admin
@@ -46,12 +44,15 @@ public:
 	string getGender() const;
 	string getContactNum() const;
 	string getContactEmail() const;
+	Contact *getContact();
 	bool getIsAssigned() const;
 
+	void setName(string n);
+	void setIC(string i);
 	void setIsAssigned(bool);
 	void printPerson() const;
-	virtual void readRecord(ifstream &) {};
-	virtual void writeRecord(ofstream &, int) const{};
+	//virtual void readRecord(ifstream &) {};
+	//virtual void writeRecord(ofstream &, int) const{};
 	void readBasic();
 	void readContact();
 };
@@ -90,6 +91,9 @@ public:
 	bool getIsAdmit() const;
 
 	static void incPatNum();
+	void setHeight(double h);
+	void setWeight(double w);
+	void setCond(string c);
 	void setIsAdmit(bool);
 	void readRecord(ifstream &);
 	void writeRecord(ofstream &, int) const;
@@ -118,7 +122,6 @@ class Ward
 {
 	bool isOccupied;
 	bool isStationed;
-	double rate;
 	Doctor *doctor;
 	Patient *patient;
 public:
@@ -133,7 +136,6 @@ public:
 	string getDoctorNameInBracket() const;
 	string getAvail() const;
 	bool getIsOccupied() const;
-	double getRate() const;
 
 	void releasePat();
 	void releaseDoc();
@@ -141,7 +143,6 @@ public:
 	void setIsOccupied(bool);
 	void setIsStationed(bool);
 	void setDoctor(Doctor *);
-	void setRate(double);
 	void doctorPtrAdjust();
 };
 #endif // !PERSON_H
